@@ -2,7 +2,7 @@ class nlp16 {
     constructor() {
         this.memory = new Uint16Array(16*1024);
         this.register = new Uint16Array(16);
-        
+
         this.instructions = new Array(256);
         this.instructions[0] = this.mov;
     }
@@ -99,3 +99,13 @@ class nlp16 {
         console.log( "mov命令" );
     }
 }
+
+
+console.log("start");
+let x = new nlp16();
+let mem = new Uint16Array(16);
+
+for( let i=0;i<16;i++ ) mem[i] = 0x0010;
+
+x.load_binary( 0, mem, 16);
+x.run(0);
