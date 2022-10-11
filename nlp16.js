@@ -44,13 +44,13 @@ class nlp16 {
 
     decode() {
         let ip = this.register[ 13 ]; // Instruction Pointer
-        let ir0 = this.memory[ ip ];
-        let ir1 = this.memory[ ip+1 ];
-        let ir2 = this.memory[ ip+2 ];
-        this.register[ 0 ] = ir0;
-        let opcode = ir0 >> 8;
-        let flag = (ir0 >> 4) & 15;
-        let op1 = ir0 & 15;
+        let ir1 = this.memory[ ip ];
+        let ir2 = this.memory[ ip+1 ];
+        let ir3 = this.memory[ ip+2 ];
+        this.register[ 0 ] = ir1;
+        let opcode = ir1 >> 8;
+        let flag = (ir1 >> 4) & 15;
+        let op1 = ir1 & 15;
         let ip_count = 1;
 
         // 1 word instruction
@@ -59,20 +59,20 @@ class nlp16 {
         }
 
         // 2 or 3 words instruction
-        this.register[1] = ir1;
+        this.register[1] = ir2 & 255;
         ip_count++;
-        let op2 = (ir1 >> 12) & 15;
-        let op3 = (ir1 >> 8 ) & 15;
-        if( op2 == 1 ) op2 = ir1 & 255;
+        let op2 = (ir2 >> 12) & 15;
+        let op3 = (ir2 >> 8 ) & 15;
+        if( op2 == 1 ) op2 = ir2 & 255;
         else if( op2 == 2 ) {
-            op2 = ir2;
-            this.register[2] = ir2;
+            op2 = ir3;
+            this.register[2] = ir3;
             ip_count++;
         }
-        if( op3 == 1 ) op3 = ir1 & 255;
+        if( op3 == 1 ) op3 = ir2 & 255;
         else if( op3 == 2 ) {
-            op3 = ir2;
-            this.register[2] = ir2;
+            op3 = ir3;
+            this.register[2] = ir3;
             ip_count++;
         }
         return [ ip_count, ip, opcode, flag, op1, op2, op3 ];
@@ -99,9 +99,7 @@ class nlp16 {
         try {
             result = this.check_flag(flag);
         } catch( err ) {
-            if( err instanceof UnasignedFlagError ) {
-                throw new UnasignedFlagError(err.message);
-            } else throw new Error( err );
+            throw err;
         }
         if( result ) {
             try {
@@ -109,7 +107,7 @@ class nlp16 {
             } catch( err ) {
                 if( err instanceof TypeError ) {
                     throw new UnasignedInstructionError('Unasigned instruction error');
-                } else throw new Error( err );
+                } else throw err;
             }
         } else {
             console.log("skiped");
@@ -165,7 +163,7 @@ let x = new nlp16();
 let mem = new Uint16Array(16);
 
 for( let i=0;i<16;i++ ) mem[i] = 0x0010;
-mem[6] = 0xff1f;
+mem[6] = 0xffff;
 
 console.log( mem );
 x.load_binary( 0, mem, 16);
