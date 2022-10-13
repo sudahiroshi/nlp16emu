@@ -154,6 +154,22 @@ class nlp16 {
         }
     }
 
+    *web_run( address ) {
+        this.change_ip( address );
+        while(true) {
+            let [ ip_count, ip, opcode, flag, op1, op2, op3 ] = this.decode();
+            yield { ip_count, ip, opcode, flag, op1, op2, op3 };
+            this.update_ip( ip_count );
+            try {
+                this.exec( opcode, flag, op1, op2, op3 );
+                yield;
+            } catch( err ) {
+                throw err;
+            }
+
+        }
+    }
+
     /**
      * 命令をデコードする
      * @returns op2, op3は，値を返している
@@ -402,4 +418,15 @@ mem[19] = 0xffff;
 
 console.log( mem );
 x.load_binary( 0, mem, 32);
-x.run(0);
+//x.run(0);
+let y = x.web_run(0);
+try {
+for( let i=0; i<20; i++ ) {
+    let result1 = y.next();
+    console.log(result1);
+    y.next();
+    console.log(x.register);
+}
+} catch( err ) {
+    console.log(err);
+}
