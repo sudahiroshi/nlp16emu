@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLP16 Emulator</title>
+    <script type="module" src="./modules/index.js"></script>
+    <link rel="stylesheet" href="./css/web_nlp16.css">
+</head>
+<body>
+    <p>バイナリ形式<input type="file" name="bin" id="bin"></p>
+    <p>テキスト形式<input type="file" name="text" id="text"></p>
+    <div id="registers">
+        <div id="reg_0"><span class="reg_name">IR1</span><span class="reg_value">0000</span></div>
+        <div id="reg_1"><span class="reg_name">IR2</span><span class="reg_value">0000</span></div>
+        <div id="reg_2"><span class="reg_name">IR3</span><span class="reg_value">0000</span></div>
+        <div id="reg_3"><span class="reg_name">Interrup Vector</span><span class="reg_value">0000</span></div>
+        <div id="reg_4"><span class="reg_name">Flag</span><span class="reg_value">0000</span></div>
+        <div id="reg_5"><span class="reg_name">RegA</span><span class="reg_value">0000</span></div>
+        <div id="reg_6"><span class="reg_name">RegB</span><span class="reg_value">0000</span></div>
+        <div id="reg_7"><span class="reg_name">RegC</span><span class="reg_value">0000</span></div>
+        <div id="reg_8"><span class="reg_name">RegD</span><span class="reg_value">0000</span></div>
+        <div id="reg_9"><span class="reg_name">RegE</span><span class="reg_value">0000</span></div>
+        <div id="reg_10"><span class="reg_name">MEM</span><span class="reg_value">0000</span></div>
+        <div id="reg_11"><span class="reg_name">Bank</span><span class="reg_value">0000</span></div>
+        <div id="reg_12"><span class="reg_name">Address</span><span class="reg_value">0000</span></div>
+        <div id="reg_13"><span class="reg_name">Instruction Pointer</span><span class="reg_value">0000</span></div>
+        <div id="reg_14"><span class="reg_name">Stack Pointer</span><span class="reg_value">0000</span></div>
+        <div id="reg_15"><span class="reg_name">Zero Register</span><span class="reg_value">0000</span></div>
+    </div>
+
+    <div id="registers1">
+        <div id="reg_0"><span class="reg_name">IR1</span><span class="reg_value">0000</span></div>
+        <div id="reg_1"><span class="reg_name">IR2</span><span class="reg_value">0000</span></div>
+        <div id="reg_2"><span class="reg_name">IR3</span><span class="reg_value">0000</span></div>
+        <div id="reg_3"><span class="reg_name">Interrup Vector</span><span class="reg_value">0000</span></div>
+        <div id="reg_4"><span class="reg_name">Flag</span><span class="reg_value">0000</span></div>
+        <div id="reg_5"><span class="reg_name">RegA</span><span class="reg_value">0000</span></div>
+        <div id="reg_6"><span class="reg_name">RegB</span><span class="reg_value">0000</span></div>
+        <div id="reg_7"><span class="reg_name">RegC</span><span class="reg_value">0000</span></div>
+        <div id="reg_8"><span class="reg_name">RegD</span><span class="reg_value">0000</span></div>
+        <div id="reg_9"><span class="reg_name">RegE</span><span class="reg_value">0000</span></div>
+        <div id="reg_10"><span class="reg_name">MEM</span><span class="reg_value">0000</span></div>
+        <div id="reg_11"><span class="reg_name">Bank</span><span class="reg_value">0000</span></div>
+        <div id="reg_12"><span class="reg_name">Address</span><span class="reg_value">0000</span></div>
+        <div id="reg_13"><span class="reg_name">Instruction Pointer</span><span class="reg_value">0000</span></div>
+        <div id="reg_14"><span class="reg_name">Stack Pointer</span><span class="reg_value">0000</span></div>
+        <div id="reg_15"><span class="reg_name">Zero Register</span><span class="reg_value">0000</span></div>
+    </div>
+
+    <div id="registers2">
+        <div id="reg_names">
+            <p>IR1</p>
+            <p>IR2</p>
+            <p>IR3</p>
+            <p>Interrup Vector</p>
+            <p>Flag</p>
+            <p>RegA</p>
+            <p>RegB</p>
+            <p>RegC</p>
+            <p>RegD</p>
+            <p>RegE</p>
+            <p>MEM</p>
+            <p>Bank</p>
+            <p>Address</p>
+            <p>Instruction Pointer</p>
+            <p>Stack Pointer</p>
+            <p>Zero Register</p>
+        </div>
+        <div id="reg_values">
+            <p id="reg_0">0000</p>
+            <p id="reg_1">0000</p>
+            <p id="reg_2">0000</p>
+            <p id="reg_3">0000</p>
+            <p id="reg_4">0000</p>
+            <p id="reg_5">0000</p>
+            <p id="reg_6">0000</p>
+            <p id="reg_7">0000</p>
+            <p id="reg_8">0000</p>
+            <p id="reg_9">0000</p>
+            <p id="reg_10">0000</p>
+            <p id="reg_11">0000</p>
+            <p id="reg_12">0000</p>
+            <p id="reg_13">0000</p>
+            <p id="reg_14">0000</p>
+            <p id="reg_15">0000</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -2,9 +2,13 @@ import nlp16 from "./nlp16.js";
 
 console.log("start");
 let x = new nlp16();
+let cpu;
 
 let bin = document.querySelector('#bin');
 let text = document.querySelector('#text');
+let reset = document.querySelector('#reset');
+let next = document.querySelector('#next');
+let con = document.querySelector('#console_main');
 let executable_bin;
 let size;
 let mem;
@@ -36,11 +40,55 @@ text.addEventListener('change', async(ev) => {
         }
         console.log(mem);
         x.load_binary( 0, mem, lines.length );
+        set_memory( 0, mem, lines.length );
         console.log( x.memory );
     });
     reader.readAsText( file );
 });
 
+reset.addEventListener('click', () => {
+    cpu = x.web_run(0);
+});
+
+next.addEventListener('click', () => {
+    let result1 = cpu.next();
+    let result2 = cpu.next();
+    //console.log( {result1, result2});
+    document.querySelector('#reg_0').innerText = padding(result1.value.ir1);
+    document.querySelector('#reg_1').innerText = padding(result1.value.ir2);
+    document.querySelector('#reg_2').innerText = padding(result1.value.ir3);
+    document.querySelector('#reg_13').innerText = padding(result1.value.ip);
+    if( "register" in result2.value ) {
+        console.log("register: " + result2.value.register.id );
+        let changed_reg = result2.value.register;
+        document.querySelector('#reg_'+changed_reg.id ).innerText = padding( changed_reg.to );
+        if( changed_reg.id == 9 ) {
+            con.innerText += String.fromCharCode( changed_reg.to );
+        }
+    }
+
+});
+
+function padding( number ) {
+    return ('000' + number.toString(16)).slice(-4);
+}
+
+function set_memory( address, mem, length ) {
+    let memory = document.querySelector('#memory');
+
+    for( let i=0; i<length; i++ ) {
+        let tr = document.createElement('tr');
+        let td1 = document.createElement('td');
+        td1.classList.add('address');
+        td1.innerText = padding( address+i );
+        let td2 = document.createElement('td');
+        td2.classList.add('mem_value');
+        td2.innerText = padding(mem[i]);
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        memory.appendChild(tr);
+    }
+}
 
 // for( let i=0;i<16;i++ ) mem[i] = 0x0010;
 // mem[0] = 0x0019; // mov 49 -> e

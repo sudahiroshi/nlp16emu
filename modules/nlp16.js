@@ -25,6 +25,8 @@ export default class nlp16 {
         this.flag_z = 4;
         this.flag_s = 8;
 
+        this.changes = {};
+
         this.define_instructions();
     }
     define_instructions() {
@@ -75,7 +77,7 @@ export default class nlp16 {
         }
         this.instructions[17] = sub;
 
-        let addwc = ( flag, op1, op2, op3 ) => {
+        let addc = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
                 let result = op2 + op3;
@@ -92,9 +94,9 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[22] = addwc;
+        this.instructions[22] = addc;
 
-        let subwc = ( flag, op1, op2, op3 ) => {
+        let subc = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
                 let result = op2 - op3;
@@ -111,7 +113,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[21] = subwc;
+        this.instructions[21] = subc;
     }
     /**
      * プログラムのロード
@@ -157,12 +159,12 @@ export default class nlp16 {
     *web_run( address ) {
         this.change_ip( address );
         while(true) {
-            let [ ip_count, ip, opcode, flag, op1, op2, op3 ] = this.decode();
-            yield { ip_count, ip, opcode, flag, op1, op2, op3 };
+            let [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ] = this.decode();
+            yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
             this.update_ip( ip_count );
             try {
                 this.exec( opcode, flag, op1, op2, op3 );
-                yield;
+                yield this.changes;
             } catch( err ) {
                 throw err;
             }
@@ -211,7 +213,7 @@ export default class nlp16 {
         } else {
             op3 = this.register[op3];
         }
-        return [ ip_count, ip, opcode, flag, op1, op2, op3 ];
+        return [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ];
     }
 
     update_ip( count ) {
@@ -294,6 +296,7 @@ export default class nlp16 {
     }
 
     store_register( register, value ) {
+         let from = this.register[ register ];
         value &= 0xffff;
         switch( register ) {
             case this.reg_ir1:
@@ -302,6 +305,7 @@ export default class nlp16 {
                 throw new IllegalRegisterError('IR1-3に書き込もうとしました');
                 break;
             case this.reg_iv:
+                this.changes[ "register" ] = { id: register, from: from, to: value };
                 this.register[ this.reg_iv ] = value;
                 break;
             case this.reg_4:
@@ -311,10 +315,12 @@ export default class nlp16 {
             case this.reg_b:
             case this.reg_c:
             case this.reg_d:
+                this.changes[ "register" ] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_e:
                 console.log( "e: " + (value & 0xff ));
+                this.changes[ "register" ] = { id: register, from: from, to: value };
                 this.register[ register ] = (value & 0xff );
                 break;
             case this.reg_mem:
@@ -327,9 +333,11 @@ export default class nlp16 {
                 this.register[ register ] = value;
                 break;
             case this.reg_ip:
+                this.changes[ "register" ] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_sp:
+                this.changes[ "register" ] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_zero:

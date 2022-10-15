@@ -1,0 +1,53 @@
+@font-face {
+    font-family: "D7CBI";
+    src: url("./fonts/DSEG7Classic-BoldItalic.woff") format('woff');
+}
+
+#reg_names {
+    background-color: blanchedalmond;
+    margin-right: 4px;
+    font-size: small;
+}
+
+.reg_name {
+    text-align: right;
+    margin-right: 4px;
+    font-size: small;
+}
+
+.reg_value {
+    font-family: D7CBI;
+}
+
+#memory {
+
+}
+
+#regs {
+
+}
+
+#ui {
+    display: flex;
+}
+.address {
+    font-family: D7CBI;
+    font-size: small;
+}
+
+.mem_value {
+    font-family: D7CBI;
+}
+#display1 {
+    display: flex;
+}
+
+#console_main {
+    width: 80em;
+    height: 25em;
+    background-color: rgb(46, 46, 46);
+    color:rgb(43, 233, 52)
+}
+#registers {
+    background-color: blanchedalmond;
+}
