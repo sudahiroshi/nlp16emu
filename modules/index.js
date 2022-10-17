@@ -12,6 +12,9 @@ let con = document.querySelector('#console_main');
 let executable_bin;
 let size;
 let mem;
+let mem_addr, mem_data;
+let old_addr = [ 0, 0 ];
+
 bin.addEventListener('change', async(ev) => {
     let file = bin.files[0];
     let reader = new FileReader();
@@ -23,6 +26,8 @@ bin.addEventListener('change', async(ev) => {
         mem = new Uint16Array(executable_bin);
         console.log( mem );
         x.load_binary( 0, mem, size );
+        mem_addr = document.querySelectorAll('.address');
+        mem_data = document.querySelectorAll('.mem_value');
     });
     reader.readAsArrayBuffer(file);
 });
@@ -42,6 +47,8 @@ text.addEventListener('change', async(ev) => {
         x.load_binary( 0, mem, lines.length );
         set_memory( 0, mem, lines.length );
         console.log( x.memory );
+        mem_addr = document.querySelectorAll('.address');
+        mem_data = document.querySelectorAll('.mem_value');
     });
     reader.readAsText( file );
 });
@@ -60,16 +67,32 @@ next.addEventListener('click', () => {
         document.querySelector('#reg_1').innerText = padding(result1.value.ir2);
         document.querySelector('#reg_2').innerText = padding(result1.value.ir3);
         document.querySelector('#reg_13').innerText = padding(result1.value.ip);
+        let ip = result1.value.ip;
+        let ip_count = result1.value.ip_count;
+        for( let add = old_addr[0]; add<old_addr[0]+old_addr[1]; add++ ) {
+            mem_addr[ add ].classList.remove( 'exec' );
+            mem_data[ add ].classList.remove( 'exec' );
+        }
+        old_addr = [ ip, ip_count ];
+        for( let add = ip; add<ip + ip_count; add++ ) {
+            mem_addr[ add ].classList.add( 'exec' );
+            mem_data[ add ].classList.add( 'exec' );
+        }
         if( "register" in result2.value ) {
+            for( let elm of document.querySelectorAll('.reg_value') ) {
+                elm.classList.remove('exec');
+            }
             for( let reg of result2.value["register"] ) {
-                console.log("register: " + reg.id );
-                document.querySelector('#reg_'+reg.id ).innerText = padding( reg.to );
+                let reg_element = document.querySelector('#reg_'+reg.id );
+                reg_element.innerText = padding( reg.to );
+                reg_element.classList.add('exec');
                 if( reg.id == 9 ) {
                     con.innerText += String.fromCharCode( reg.to );
                 }
             }
         }
     } catch( err ) {
+        console.log( err );
         console.log( {result1, result2 });
     }
 });
@@ -94,37 +117,3 @@ function set_memory( address, mem, length ) {
         memory.appendChild(tr);
     }
 }
-
-// for( let i=0;i<16;i++ ) mem[i] = 0x0010;
-// mem[0] = 0x0019; // mov 49 -> e
-// mem[1] = 0x1031;
-// mem[2] = 0x1219; // add 32 + 32 -> e
-// mem[3] = 0x1120;
-// mem[4] = 0x1119; // sub 32 - 32 -> e
-// mem[5] = 0x1120;
-// mem[6] = 0x1219; // add 32 + 4369 -> e
-// mem[7] = 0x1220;
-// mem[8] = 0x1111;
-// mem[9] = 0x1119; // sub 4369 - 32 -> e
-// mem[10] = 0x2120;
-// mem[11] = 0x1111;
-// mem[12] = 0x1119; // sub 32 - 4369 -> e
-// mem[13] = 0x1220;
-// mem[14] = 0x1111;
-// mem[15] = 0x0019; // mov flag -> e
-// mem[16] = 0x4000;
-// mem[17] = 0x1629; // addwc 0+0 -> e
-// mem[18] = 0x1100;
-// mem[19] = 0xffff;
-
-// let y = x.web_run(0);
-// try {
-// for( let i=0; i<20; i++ ) {
-//     let result1 = y.next();
-//     console.log(result1);
-//     y.next();
-//     console.log(x.register);
-// }
-// } catch( err ) {
-//     console.log(err);
-// }

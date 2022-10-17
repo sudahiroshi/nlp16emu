@@ -63,3 +63,7 @@ table {
     width: 100%;
     table-layout: fixed;
 }
+
+.exec {
+    background-color: #b7c0b2;
+}
