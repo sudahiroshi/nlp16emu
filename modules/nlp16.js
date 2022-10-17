@@ -26,12 +26,13 @@ export default class nlp16 {
         this.flag_s = 8;
 
         this.changes = {};
+        this.changes[ "register" ] = [];
 
         this.define_instructions();
     }
     define_instructions() {
         this.instructions = {};
-        let mov = ( flag, op1, op2, op3 ) => {
+        let op_mov = ( flag, op1, op2, op3 ) => {
             console.log({flag, op1, op2, op3})
             try {
                 this.store_register( op1, op2 );
@@ -39,9 +40,9 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0] = mov;
+        this.instructions[0] = op_mov;
 
-        let add = ( flag, op1, op2, op3 ) => {
+        let op_add = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
                 let result = op2 + op3;
@@ -52,14 +53,14 @@ export default class nlp16 {
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
                 if( result == 0 )    new_flag = this.flag_z;
                 this.store_register( op1, result );
-                this.store_flag( new_flag );
+                this.store_flag( flag, new_flag );
             } catch( err ) {
                 throw err;
             }
         }
-        this.instructions[18] = add;
+        this.instructions[18] = op_add;
 
-        let sub = ( flag, op1, op2, op3 ) => {
+        let op_sub = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
                 let result = op2 - op3;
@@ -70,14 +71,14 @@ export default class nlp16 {
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
                 if( result == 0 )    new_flag = this.flag_z;
                 this.store_register( op1, result );
-                this.store_flag( new_flag );
+                this.store_flag( flag, new_flag );
             } catch( err ) {
                 throw err;
             }
         }
-        this.instructions[17] = sub;
+        this.instructions[17] = op_sub;
 
-        let addc = ( flag, op1, op2, op3 ) => {
+        let op_addc = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
                 let result = op2 + op3;
@@ -89,14 +90,14 @@ export default class nlp16 {
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
                 if( result == 0 )    new_flag = this.flag_z;
                 this.store_register( op1, result );
-                this.store_flag( new_flag );
+                this.store_flag( flag, new_flag );
             } catch( err ) {
                 throw err;
             }
         }
-        this.instructions[22] = addc;
+        this.instructions[22] = op_addc;
 
-        let subc = ( flag, op1, op2, op3 ) => {
+        let op_subc = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
                 let result = op2 - op3;
@@ -108,12 +109,165 @@ export default class nlp16 {
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
                 if( result == 0 )    new_flag = this.flag_z;
                 this.store_register( op1, result );
-                this.store_flag( new_flag );
+                this.store_flag( flag, new_flag );
             } catch( err ) {
                 throw err;
             }
         }
-        this.instructions[21] = subc;
+        this.instructions[21] = op_subc;
+
+        let op_or = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = op2 | op3;
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag = this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[10] = op_or;
+
+        let op_not = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = (~op2) & 0xffff;
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag = this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[12] = op_not;
+
+        let op_xor = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = op2 ^ op3;
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag = this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[14] = op_xor;
+
+        let op_and = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = op2 & op3;
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag = this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[6] = op_and;
+
+        let op_inc = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = op2 + 1;
+                if( result > 0xffff ) {
+                    result &= 0xffff;
+                    new_flag |= this.flag_c | this.flag_v;
+                }
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag = this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[27] = op_inc;
+
+        let op_dec = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = op2 - 1;
+                if( result < 0 ) {
+                    result &= 0xffff;
+                    new_flag |= this.flag_c | this.flag_v;
+                }
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag = this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[24] = op_dec;
+
+        let op_incc = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = op2 + 1;
+                if( flag & this.flag_c ) result += 1;
+                if( result > 0xffff ) {
+                    result &= 0xffff;
+                    new_flag |= this.flag_c | this.flag_v;
+                }
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag = this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[31] = op_incc;
+
+        let op_decc = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = op2 - 1;
+                if( flag & this.flag_c ) result -= 1;
+                if( result < 0 ) {
+                    result &= 0xffff;
+                    new_flag |= this.flag_c | this.flag_v;
+                }
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag = this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[28] = op_decc;
+
+        let op_push = ( flag, op1, op2, op3 ) => {
+            try {
+                let result = this.register[ this.sp ] - 1;
+                this.store_register( this.sp, result );
+                this.store_memory( result, op1 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0xd0] = op_push;
+
+        let op_pop = ( flag, op1, op2, op3 ) => {
+            try {
+                let result1 = this.memory[ this.register[ this.sp ] ];
+                this.store_register( op1, result1 );
+                let result2 = this.register[ this.sp ] + 1;
+                this.store_register( this.sp, result2 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0xd0] = op_push;
     }
     /**
      * プログラムのロード
@@ -159,6 +313,8 @@ export default class nlp16 {
     *web_run( address ) {
         this.change_ip( address );
         while(true) {
+            this.changes = {};
+            this.changes[ "register" ] = [];
             let [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ] = this.decode();
             yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
             this.update_ip( ip_count );
@@ -188,7 +344,7 @@ export default class nlp16 {
         let ip_count = 1;
 
         // 1 word instruction
-        if( opcode == 0xc0 || opcode == 0xe0 ) {
+        if( opcode == 0xc0 || opcode == 0xd0 || opcode == 0xe0 ) {
             return [ ip_count, ip, opcode, flag, this.register[this.reg_ip], null, null ];
         }
 
@@ -296,7 +452,7 @@ export default class nlp16 {
     }
 
     store_register( register, value ) {
-         let from = this.register[ register ];
+        let from = this.register[ register ];
         value &= 0xffff;
         switch( register ) {
             case this.reg_ir1:
@@ -305,7 +461,7 @@ export default class nlp16 {
                 throw new IllegalRegisterError('IR1-3に書き込もうとしました');
                 break;
             case this.reg_iv:
-                this.changes[ "register" ] = { id: register, from: from, to: value };
+                this.changes[ "register" ].push( { id: register, from: from, to: value } );
                 this.register[ this.reg_iv ] = value;
                 break;
             case this.reg_4:
@@ -315,12 +471,12 @@ export default class nlp16 {
             case this.reg_b:
             case this.reg_c:
             case this.reg_d:
-                this.changes[ "register" ] = { id: register, from: from, to: value };
+                this.changes[ "register" ].push( { id: register, from: from, to: value } );
                 this.register[ register ] = value;
                 break;
             case this.reg_e:
                 console.log( "e: " + (value & 0xff ));
-                this.changes[ "register" ] = { id: register, from: from, to: value };
+                this.changes[ "register" ].push( { id: register, from: from, to: value } );
                 this.register[ register ] = (value & 0xff );
                 break;
             case this.reg_mem:
@@ -333,11 +489,11 @@ export default class nlp16 {
                 this.register[ register ] = value;
                 break;
             case this.reg_ip:
-                this.changes[ "register" ] = { id: register, from: from, to: value };
+                this.changes[ "register" ].push( { id: register, from: from, to: value } );
                 this.register[ register ] = value;
                 break;
             case this.reg_sp:
-                this.changes[ "register" ] = { id: register, from: from, to: value };
+                this.changes[ "register" ].push( { id: register, from: from, to: value } );
                 this.register[ register ] = value;
                 break;
             case this.reg_zero:
@@ -346,24 +502,16 @@ export default class nlp16 {
                 throw new IllegalRegisterError('レジスタ名が異常です\nregister_id: ' + register );
         }
     }
-    store_flag( value ) {
+    store_flag( old, value ) {
         console.log( {value})
         this.register[ this.reg_flag ] = value;
+        this.changes[ "register" ].push( { id: this.reg_flag, from: old, to: value } );
+        this.changes[ "flag" ] = { id: this.reg_flag, from: old, to: value };
     }
-
-    mov( flag, op1, op2, op3 ) {
-        console.log(op2);
-        console.log(this);
-        console.log( this.register);
-        try {
-        let value = this.register[ op2 ];
-        console.log( {op1, op2, value })
-        this.store_register( op1, this.register[ op2 ] );
-        console.log( "mov命令" );
-        } catch( err ) {
-            console.log(err);
-            throw err;
-        }
+    store_memory( address, value ) {
+        let from = this.address[ address ];
+        this.address[ address ] = value;
+        this.changes[ "memory" ] = { address: address, from: from, to: value };
     }
 }
 

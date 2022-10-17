@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,11 +24,15 @@
     <div id="display1">
     <div>
         <table id="memory">
+            <thead>
             <tr><th>address</th><th>value</th></tr>
+            </thead>
+            <tbody id="memory_view1"></tbody>
         </table>
     </div>
     <div id="regs">
         <table>
+            <tbody>
             <tr><td class="reg_name">IR1</td><td class="reg_value" id="reg_0">0000</td></tr>
             <tr><td class="reg_name">IR2</td><td class="reg_value" id="reg_1">0000</td></tr>
             <tr><td class="reg_name">IR3</td><td class="reg_value" id="reg_2">0000</td></tr>
@@ -45,6 +49,7 @@
             <tr><td class="reg_name">Instruction Pointer</td><td class="reg_value" id="reg_13">0000</td></tr>
             <tr><td class="reg_name">Stack Pointer</td><td class="reg_value" id="reg_14">0000</td></tr>
             <tr><td class="reg_name">Zero Register</td><td class="reg_value" id="reg_15">0000</td></tr>
+            </tbody>
         </table>
     </div>
     </div>

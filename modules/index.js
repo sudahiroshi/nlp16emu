@@ -51,22 +51,27 @@ reset.addEventListener('click', () => {
 });
 
 next.addEventListener('click', () => {
-    let result1 = cpu.next();
-    let result2 = cpu.next();
-    //console.log( {result1, result2});
-    document.querySelector('#reg_0').innerText = padding(result1.value.ir1);
-    document.querySelector('#reg_1').innerText = padding(result1.value.ir2);
-    document.querySelector('#reg_2').innerText = padding(result1.value.ir3);
-    document.querySelector('#reg_13').innerText = padding(result1.value.ip);
-    if( "register" in result2.value ) {
-        console.log("register: " + result2.value.register.id );
-        let changed_reg = result2.value.register;
-        document.querySelector('#reg_'+changed_reg.id ).innerText = padding( changed_reg.to );
-        if( changed_reg.id == 9 ) {
-            con.innerText += String.fromCharCode( changed_reg.to );
+    let result1, result2;
+    try {
+        result1 = cpu.next();
+        result2 = cpu.next();
+        //console.log( {result1, result2});
+        document.querySelector('#reg_0').innerText = padding(result1.value.ir1);
+        document.querySelector('#reg_1').innerText = padding(result1.value.ir2);
+        document.querySelector('#reg_2').innerText = padding(result1.value.ir3);
+        document.querySelector('#reg_13').innerText = padding(result1.value.ip);
+        if( "register" in result2.value ) {
+            for( let reg of result2.value["register"] ) {
+                console.log("register: " + reg.id );
+                document.querySelector('#reg_'+reg.id ).innerText = padding( reg.to );
+                if( reg.id == 9 ) {
+                    con.innerText += String.fromCharCode( reg.to );
+                }
+            }
         }
+    } catch( err ) {
+        console.log( {result1, result2 });
     }
-
 });
 
 function padding( number ) {
@@ -74,7 +79,7 @@ function padding( number ) {
 }
 
 function set_memory( address, mem, length ) {
-    let memory = document.querySelector('#memory');
+    let memory = document.querySelector('#memory_view1');
 
     for( let i=0; i<length; i++ ) {
         let tr = document.createElement('tr');

@@ -33,6 +33,7 @@
 .address {
     font-family: D7CBI;
     font-size: small;
+    color: rgb(136, 134, 134);
 }
 
 .mem_value {
@@ -50,4 +51,15 @@
 }
 #registers {
     background-color: blanchedalmond;
+}
+#memory_view1 {
+    display: block;
+    max-height: 25em;
+    overflow: auto;
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
 }
