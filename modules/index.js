@@ -91,6 +91,22 @@ next.addEventListener('click', () => {
                 }
             }
         }
+        if( "flag" in result2.value ) {
+            let flag = result2.value["flag"]["to"];
+            if( flag & 8 ){
+
+                document.querySelector('#flag_s').classList.add('indicator_on');
+            } 
+            else {
+                document.querySelector('#flag_s').classList.remove('indicator_on');
+            }
+            if( flag & 4 ) document.querySelector('#flag_z').classList.add('indicator_on');
+            else document.querySelector('#flag_z').classList.remove('indicator_on');
+            if( flag & 2 ) document.querySelector('#flag_v').classList.add('indicator_on');
+            else document.querySelector('#flag_v').classList.remove('indicator_on');
+            if( flag & 1 ) document.querySelector('#flag_c').classList.add('indicator_on');
+            else document.querySelector('#flag_c').classList.remove('indicator_on');
+        }
     } catch( err ) {
         console.log( err );
         console.log( {result1, result2 });

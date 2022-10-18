@@ -67,3 +67,18 @@ table {
 .exec {
     background-color: #b7c0b2;
 }
+
+.indicator {
+    color: #66f;
+    text-shadow: 0px 0px 3px #aaf;
+}
+
+.flag_indicator {
+    margin-right: 4px;
+
+}
+
+.indicator_on {
+    color: #f22;
+    text-shadow: 0px 0px 8px #f66;
+}

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <script type="module" src="./modules/index.js"></script>
     <link rel="stylesheet" href="./css/web_nlp16.css">
 </head>
+
 <body>
     <H1>NLP16 Emulator</H1>
     <div id="ui">
@@ -20,42 +22,120 @@
         </div>
     </div>
 
-
     <div id="display1">
-    <div>
-        <table id="memory">
-            <thead>
-            <tr><th>address</th><th>value</th></tr>
-            </thead>
-            <tbody id="memory_view1"></tbody>
-        </table>
-    </div>
-    <div id="regs">
-        <table>
-            <tbody>
-            <tr><td class="reg_name">IR1</td><td class="reg_value" id="reg_0">0000</td></tr>
-            <tr><td class="reg_name">IR2</td><td class="reg_value" id="reg_1">0000</td></tr>
-            <tr><td class="reg_name">IR3</td><td class="reg_value" id="reg_2">0000</td></tr>
-            <tr><td class="reg_name">Interrupt Vector</td><td class="reg_value" id="reg_3">0000</td></tr>
-            <tr><td class="reg_name">Flag</td><td class="reg_value" id="reg_4">0000</td></tr>
-            <tr><td class="reg_name">RegA</td><td class="reg_value" id="reg_5">0000</td></tr>
-            <tr><td class="reg_name">RegB</td><td class="reg_value" id="reg_6">0000</td></tr>
-            <tr><td class="reg_name">RegC</td><td class="reg_value" id="reg_7">0000</td></tr>
-            <tr><td class="reg_name">RegD</td><td class="reg_value" id="reg_8">0000</td></tr>
-            <tr><td class="reg_name">RegE</td><td class="reg_value" id="reg_9">0000</td></tr>
-            <tr><td class="reg_name">MEM</td><td class="reg_value" id="reg_10">0000</td></tr>
-            <tr><td class="reg_name">Bank</td><td class="reg_value" id="reg_11">0000</td></tr>
-            <tr><td class="reg_name">Address</td><td class="reg_value" id="reg_12">0000</td></tr>
-            <tr><td class="reg_name">Instruction Pointer</td><td class="reg_value" id="reg_13">0000</td></tr>
-            <tr><td class="reg_name">Stack Pointer</td><td class="reg_value" id="reg_14">0000</td></tr>
-            <tr><td class="reg_name">Zero Register</td><td class="reg_value" id="reg_15">0000</td></tr>
-            </tbody>
-        </table>
-    </div>
+        <div>
+            <table id="memory">
+                <thead>
+                    <tr>
+                        <th colspan="2">Memory</th>
+                    </tr>
+                </thead>
+                <tbody id="memory_view1"></tbody>
+            </table>
+        </div>
+        <div id="regs">
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2">Register</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="reg_name">IR1</td>
+                        <td class="reg_value" id="reg_0">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">IR2</td>
+                        <td class="reg_value" id="reg_1">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">IR3</td>
+                        <td class="reg_value" id="reg_2">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">Interrupt Vector</td>
+                        <td class="reg_value" id="reg_3">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">Flag</td>
+                        <td class="reg_value" id="reg_4">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">RegA</td>
+                        <td class="reg_value" id="reg_5">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">RegB</td>
+                        <td class="reg_value" id="reg_6">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">RegC</td>
+                        <td class="reg_value" id="reg_7">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">RegD</td>
+                        <td class="reg_value" id="reg_8">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">RegE</td>
+                        <td class="reg_value" id="reg_9">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">MEM</td>
+                        <td class="reg_value" id="reg_10">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">Bank</td>
+                        <td class="reg_value" id="reg_11">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">Address</td>
+                        <td class="reg_value" id="reg_12">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">Instruction Pointer</td>
+                        <td class="reg_value" id="reg_13">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">Stack Pointer</td>
+                        <td class="reg_value" id="reg_14">0000</td>
+                    </tr>
+                    <tr>
+                        <td class="reg_name">Zero Register</td>
+                        <td class="reg_value" id="reg_15">0000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="indicator">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Flags</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="flag_s" class="flag_name">Sign</td>
+                    </tr>
+                    <tr>
+                        <td id="flag_z" class="flag_name">Zero</td>
+                    </tr>
+                    <tr>
+                        <td id="flag_v" class="flag_name">Overflow</td>
+                    </tr>
+                    <tr>
+                        <td id="flag_c" class="flag_name">Carry</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div id="console">
         <pre id="console_main"></pre>
     </div>
     <footer>NLP16 Emulator by Hiroshi Suda<br>Font "DSEG" by けしかん</footer>
 </body>
+
 </html>
