@@ -12,7 +12,7 @@ let con = document.querySelector('#console_main');
 let executable_bin;
 let size;
 let mem;
-let mem_addr, mem_data;
+//let mem_addr, mem_data;
 let old_addr = [ 0, 0 ];
 
 bin.addEventListener('change', async(ev) => {
@@ -26,8 +26,8 @@ bin.addEventListener('change', async(ev) => {
         mem = new Uint16Array(executable_bin);
         console.log( mem );
         x.load_binary( 0, mem, size );
-        mem_addr = document.querySelectorAll('.address');
-        mem_data = document.querySelectorAll('.mem_value');
+        //mem_addr = document.querySelectorAll('.address');
+        //mem_data = document.querySelectorAll('.mem_value');
     });
     reader.readAsArrayBuffer(file);
 });
@@ -47,8 +47,8 @@ text.addEventListener('change', async(ev) => {
         x.load_binary( 0, mem, lines.length );
         set_memory( 0, mem, lines.length );
         console.log( x.memory );
-        mem_addr = document.querySelectorAll('.address');
-        mem_data = document.querySelectorAll('.mem_value');
+        //mem_addr = document.querySelectorAll('.address');
+        //mem_data = document.querySelectorAll('.mem_value');
     });
     reader.readAsText( file );
 });
@@ -69,14 +69,13 @@ next.addEventListener('click', () => {
         document.querySelector('#reg_13').innerText = padding(result1.value.ip);
         let ip = result1.value.ip;
         let ip_count = result1.value.ip_count;
+        let memory_view = document.querySelector('#memory_view1');
         for( let add = old_addr[0]; add<old_addr[0]+old_addr[1]; add++ ) {
-            mem_addr[ add ].classList.remove( 'exec' );
-            mem_data[ add ].classList.remove( 'exec' );
+            memory_view.querySelector(`tr:nth-child(${add+1})`).classList.remove('exec');
         }
         old_addr = [ ip, ip_count ];
         for( let add = ip; add<ip + ip_count; add++ ) {
-            mem_addr[ add ].classList.add( 'exec' );
-            mem_data[ add ].classList.add( 'exec' );
+            memory_view.querySelector(`tr:nth-child(${add+1})`).classList.add('exec');
         }
         if( "register" in result2.value ) {
             for( let elm of document.querySelectorAll('.reg_value') ) {
