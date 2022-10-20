@@ -29,6 +29,8 @@ export default class nlp16 {
         this.changes[ "register" ] = [];
 
         this.define_instructions();
+        console.log( "32" );
+        console.log( this.instructions );
     }
     define_instructions() {
         this.instructions = {};
@@ -46,12 +48,17 @@ export default class nlp16 {
             try {
                 let new_flag = 0;
                 let result = op2 + op3;
-                if( result > 0xffff ) {
-                    result &= 0xffff;
-                    new_flag |= this.flag_c | this.flag_v;
+                // 負数+負数->正数 または 正数+正数->負数 のときSフラグが立つ
+                if(
+                    ((op2>0x8000)&&(op3>0x8000)&&(result<0x8000)) ||
+                    ((op2<0x8000)&&(op3<0x8000)&&(result>=0x8000)) ) {
+                    new_flag |= this.flag_v;
                 }
+                // 17bit目に1が立つときCフラグが立つ
+                if( result & 0x10000 )  new_flag |= this.flag_c;
+                result &= 0xffff;
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
+                if( result == 0 )    new_flag |= this.flag_z;
                 this.store_register( op1, result );
                 this.store_flag( flag, new_flag );
             } catch( err ) {
@@ -63,13 +70,19 @@ export default class nlp16 {
         let op_sub = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
-                let result = op2 - op3;
-                if( result < 0 ) {
-                    result &= 0xffff;
-                    new_flag |= this.flag_c | this.flag_v;
+                let neg_op3 = -op3;
+                let result = op2 + neg_op3;
+                // 負数+負数->正数 または 正数+正数->負数 のときSフラグが立つ
+                if(
+                    ((op2>0x8000)&&(neg_op3>0x8000)&&(result<0x8000)) ||
+                    ((op2<0x8000)&&(neg_op3<0x8000)&&(result>=0x8000)) ) {
+                    new_flag |= this.flag_v;
                 }
+                // 17bit目に1が立つときCフラグが立つ
+                if( result & 0x10000 )  new_flag |= this.flag_c;
+                result &= 0xffff;
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
+                if( result == 0 )    new_flag |= this.flag_z;
                 this.store_register( op1, result );
                 this.store_flag( flag, new_flag );
             } catch( err ) {
@@ -83,12 +96,17 @@ export default class nlp16 {
                 let new_flag = 0;
                 let result = op2 + op3;
                 if( flag & this.flag_c ) result += 1;
-                if( result > 0xffff ) {
-                    result &= 0xffff;
-                    new_flag |= this.flag_c | this.flag_v;
+                // 負数+負数->正数 または 正数+正数->負数 のときSフラグが立つ
+                if(
+                    ((op2>0x8000)&&(op3>0x8000)&&(result<0x8000)) ||
+                    ((op2<0x8000)&&(op3<0x8000)&&(result>=0x8000)) ) {
+                    new_flag |= this.flag_v;
                 }
+                // 17bit目に1が立つときCフラグが立つ
+                if( result & 0x10000 )  new_flag |= this.flag_c;
+                result &= 0xffff;
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
+                if( result == 0 )    new_flag |= this.flag_z;
                 this.store_register( op1, result );
                 this.store_flag( flag, new_flag );
             } catch( err ) {
@@ -100,14 +118,20 @@ export default class nlp16 {
         let op_subc = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
-                let result = op2 - op3;
+                let neg_op3 = -op3;
+                let result = op2 + neg_op3;
                 if( flag & this.flag_c ) result -= 1;
-                if( result < 0 ) {
-                    result &= 0xffff;
-                    new_flag |= this.flag_c | this.flag_v;
+                // 負数+負数->正数 または 正数+正数->負数 のときSフラグが立つ
+                if(
+                    ((op2>0x8000)&&(neg_op3>0x8000)&&(result<0x8000)) ||
+                    ((op2<0x8000)&&(neg_op3<0x8000)&&(result>=0x8000)) ) {
+                    new_flag |= this.flag_v;
                 }
+                // 17bit目に1が立つときCフラグが立つ
+                if( result & 0x10000 )  new_flag |= this.flag_c;
+                result &= 0xffff;
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
+                if( result == 0 )    new_flag |= this.flag_z;
                 this.store_register( op1, result );
                 this.store_flag( flag, new_flag );
             } catch( err ) {
@@ -121,7 +145,7 @@ export default class nlp16 {
                 let new_flag = 0;
                 let result = op2 | op3;
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
+                if( result == 0 )    new_flag |= this.flag_z;
                 this.store_register( op1, result );
                 this.store_flag( flag, new_flag );
             } catch( err ) {
@@ -135,7 +159,7 @@ export default class nlp16 {
                 let new_flag = 0;
                 let result = (~op2) & 0xffff;
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
+                if( result == 0 )    new_flag |= this.flag_z;
                 this.store_register( op1, result );
                 this.store_flag( flag, new_flag );
             } catch( err ) {
@@ -149,7 +173,7 @@ export default class nlp16 {
                 let new_flag = 0;
                 let result = op2 ^ op3;
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
+                if( result == 0 )    new_flag |= this.flag_z;
                 this.store_register( op1, result );
                 this.store_flag( flag, new_flag );
             } catch( err ) {
@@ -163,7 +187,7 @@ export default class nlp16 {
                 let new_flag = 0;
                 let result = op2 & op3;
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
+                if( result == 0 )    new_flag |= this.flag_z;
                 this.store_register( op1, result );
                 this.store_flag( flag, new_flag );
             } catch( err ) {
@@ -174,16 +198,7 @@ export default class nlp16 {
 
         let op_inc = ( flag, op1, op2, op3 ) => {
             try {
-                let new_flag = 0;
-                let result = op2 + 1;
-                if( result > 0xffff ) {
-                    result &= 0xffff;
-                    new_flag |= this.flag_c | this.flag_v;
-                }
-                if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
-                this.store_register( op1, result );
-                this.store_flag( flag, new_flag );
+                op_add( flag, op1, op2, 1 );
             } catch( err ) {
                 throw err;
             }
@@ -192,16 +207,7 @@ export default class nlp16 {
 
         let op_dec = ( flag, op1, op2, op3 ) => {
             try {
-                let new_flag = 0;
-                let result = op2 - 1;
-                if( result < 0 ) {
-                    result &= 0xffff;
-                    new_flag |= this.flag_c | this.flag_v;
-                }
-                if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
-                this.store_register( op1, result );
-                this.store_flag( flag, new_flag );
+                op_sub( flag, op1, op2, 1 );
             } catch( err ) {
                 throw err;
             }
@@ -210,17 +216,7 @@ export default class nlp16 {
 
         let op_incc = ( flag, op1, op2, op3 ) => {
             try {
-                let new_flag = 0;
-                let result = op2 + 1;
-                if( flag & this.flag_c ) result += 1;
-                if( result > 0xffff ) {
-                    result &= 0xffff;
-                    new_flag |= this.flag_c | this.flag_v;
-                }
-                if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
-                this.store_register( op1, result );
-                this.store_flag( flag, new_flag );
+                op_addc( flag, op1, op2, 1 );
             } catch( err ) {
                 throw err;
             }
@@ -229,17 +225,7 @@ export default class nlp16 {
 
         let op_decc = ( flag, op1, op2, op3 ) => {
             try {
-                let new_flag = 0;
-                let result = op2 - 1;
-                if( flag & this.flag_c ) result -= 1;
-                if( result < 0 ) {
-                    result &= 0xffff;
-                    new_flag |= this.flag_c | this.flag_v;
-                }
-                if( result >= 0x8000 )  new_flag |= this.flag_s;
-                if( result == 0 )    new_flag = this.flag_z;
-                this.store_register( op1, result );
-                this.store_flag( flag, new_flag );
+                op_subc( flag, op1, op2, 1 );
             } catch( err ) {
                 throw err;
             }
