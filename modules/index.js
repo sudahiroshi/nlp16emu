@@ -109,6 +109,9 @@ next.addEventListener('click', () => {
     } catch( err ) {
         console.log( err );
         console.log( {result1, result2 });
+        document.querySelector('#terminate').classList.remove('normal');
+        document.querySelector('#terminate').classList.add('terminate');
+        document.querySelector('#reason').innerText = err.message;
     }
 });
 

@@ -329,7 +329,7 @@ export default class nlp16 {
         let op1 = ir1 & 15;
         let ip_count = 1;
 
-        // 1 word instruction
+        // 1 word instruction POP(RET) / PUSH / RETI
         if( opcode == 0xc0 || opcode == 0xd0 || opcode == 0xe0 ) {
             return [ ip_count, ip, opcode, flag, this.register[this.reg_ip], null, null ];
         }
