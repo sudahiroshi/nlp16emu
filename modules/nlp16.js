@@ -232,6 +232,93 @@ export default class nlp16 {
         }
         this.instructions[28] = op_decc;
 
+        let op_slr = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = op2 >> 1;
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag |= this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x28] = op_slr;
+
+        let op_sll = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = (op2 << 1) & 0xffff;
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag |= this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x20] = op_sar;
+
+        let op_sar = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = op2 >> 1;
+                result |= op2 & 0x8000;
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag |= this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x2c] = op_sar;
+
+        let op_sal = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = (op2 << 1) | (op2 & 0x8000) & 0xffff;
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag |= this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x24] = op_sal;
+
+        let op_ror = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = (op2 >> 1);
+                if( op2 & 1 ) result |= 0x8000;
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag |= this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x2a] = op_ror;
+
+        let op_rol = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_flag = 0;
+                let result = (op2 << 1) & 0x8000;
+                if( op2 & 0x8000 ) result |= 1;
+                if( result >= 0x8000 )  new_flag |= this.flag_s;
+                if( result == 0 )    new_flag |= this.flag_z;
+                this.store_register( op1, result );
+                this.store_flag( flag, new_flag );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x22] = op_rol;
+
         let op_push = ( flag, op1, op2, op3 ) => {
             try {
                 let result = this.register[ this.sp ] - 1;
