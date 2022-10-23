@@ -341,7 +341,118 @@ export default class nlp16 {
             }
         }
         this.instructions[0xd0] = op_push;
+
+        let op_call = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_sp = this.register[ this.sp ] - 1;
+                this.store_register( this.sp, new_sp );
+                this.store_memory( this.register[ this.sp ], this.ip );
+                this.store_register( this.ip, op1 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0xb0] = op_call;
+
+        let op_calladd = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_sp = this.register[ this.sp ] - 1;
+                this.store_register( this.sp, new_sp );
+                this.store_memory( this.register[ this.sp ], this.ip );
+                let result = op2 + op3;
+                this.store_register( this.ip, op1 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0xba] = op_calladd;
+
+        let op_callsub = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_sp = this.register[ this.sp ] - 1;
+                this.store_register( this.sp, new_sp );
+                this.store_memory( this.register[ this.sp ], this.ip );
+                let result = op1 + op2;
+                this.store_register( this.ip, op1 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0xb9] = op_callsub;
+
+        let ret = ( flag, op1, op2, op3 ) => {
+            try {
+                let new_ip = this.memory( this.register[ this.sp ] );
+                let new_sp = this.register[ this.sp ] + 1;
+                this.store_register( this.sp, new_sp );
+                this.store_register( this.ip, new_ip );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0xc0] = op_ret;
+        this.instructions[0xe0] = op_ret;   // reti
+
+        let op_load = ( flag, op1, op2, op3 ) => {
+            try {
+                let result1 = this.memory[ op2 ];
+                this.store_register( op1, result1 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x80] = op_load;
+
+        let op_loadadd = ( flag, op1, op2, op3 ) => {
+            try {
+                let result1 = this.memory[ op2 + op3 ];
+                this.store_register( op1, result1 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x8a] = op_loadadd;
+
+        let op_loadsub = ( flag, op1, op2, op3 ) => {
+            try {
+                let result1 = this.memory[ op2 - op3 ];
+                this.store_register( op1, result1 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x89] = op_loadsub;
+
+        let op_store = ( flag, op1, op2, op3 ) => {
+            try {
+                this.store_memory( op2, op1 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x90] = op_store;
+
+        let op_storeadd = ( flag, op1, op2, op3 ) => {
+            try {
+                let result1 = op2 + op3;
+                this.store_memory( result, op1 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x9a] = op_storeadd;
+
+        let op_storesub = ( flag, op1, op2, op3 ) => {
+            try {
+                let result1 = op2 - op3;
+                this.store_memory( result, op1 );
+            } catch( err ) {
+                throw err;
+            }
+        }
+        this.instructions[0x99] = op_storesub;
     }
+
     /**
      * プログラムのロード
      * @param {number} address ロードするアドレス
