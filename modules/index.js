@@ -61,7 +61,9 @@ next.addEventListener('click', () => {
     let result1, result2;
     try {
         result1 = cpu.next();
+        console.log( {result1} );
         result2 = cpu.next();
+        console.log( {result2} );
         //console.log( {result1, result2});
         document.querySelector('#reg_0').innerText = padding(result1.value.ir1);
         document.querySelector('#reg_1').innerText = padding(result1.value.ir2);
@@ -116,7 +118,10 @@ next.addEventListener('click', () => {
 });
 
 function padding( number ) {
-    return ('000' + number.toString(16)).slice(-4);
+    if( number )
+        return ('000' + number.toString(16)).slice(-4);
+    else if( number == 0 )  return '0000';
+    else return '----';
 }
 
 function set_memory( address, mem, length ) {

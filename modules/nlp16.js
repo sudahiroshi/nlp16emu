@@ -55,6 +55,7 @@ export default class nlp16 {
         this.changes[ "register" ] = [];
 
         this.define_instructions();
+        console.log(this.instructions);
     }
     /**
      * 命令セットの定義
@@ -62,7 +63,6 @@ export default class nlp16 {
     define_instructions() {
         this.instructions = {};
         let op_mov = ( flag, op1, op2, op3 ) => {
-            console.log({flag, op1, op2, op3})
             try {
                 this.store_register( op1, op2 );
             } catch( err ) {
@@ -92,7 +92,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[18] = op_add;
+        this.instructions[0x12] = op_add;
 
         let op_sub = ( flag, op1, op2, op3 ) => {
             try {
@@ -116,7 +116,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[17] = op_sub;
+        this.instructions[0x11] = op_sub;
 
         let op_addc = ( flag, op1, op2, op3 ) => {
             try {
@@ -140,7 +140,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[22] = op_addc;
+        this.instructions[0x16] = op_addc;
 
         let op_subc = ( flag, op1, op2, op3 ) => {
             try {
@@ -165,7 +165,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[21] = op_subc;
+        this.instructions[0x15] = op_subc;
 
         let op_or = ( flag, op1, op2, op3 ) => {
             try {
@@ -179,7 +179,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[10] = op_or;
+        this.instructions[0x0a] = op_or;
 
         let op_not = ( flag, op1, op2, op3 ) => {
             try {
@@ -193,7 +193,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[12] = op_not;
+        this.instructions[0x0c] = op_not;
 
         let op_xor = ( flag, op1, op2, op3 ) => {
             try {
@@ -207,7 +207,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[14] = op_xor;
+        this.instructions[0x0e] = op_xor;
 
         let op_and = ( flag, op1, op2, op3 ) => {
             try {
@@ -221,7 +221,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[6] = op_and;
+        this.instructions[0x06] = op_and;
 
         let op_inc = ( flag, op1, op2, op3 ) => {
             try {
@@ -230,7 +230,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[27] = op_inc;
+        this.instructions[0x1b] = op_inc;
 
         let op_dec = ( flag, op1, op2, op3 ) => {
             try {
@@ -239,7 +239,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[24] = op_dec;
+        this.instructions[0x18] = op_dec;
 
         let op_incc = ( flag, op1, op2, op3 ) => {
             try {
@@ -248,7 +248,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[31] = op_incc;
+        this.instructions[0x1f] = op_incc;
 
         let op_decc = ( flag, op1, op2, op3 ) => {
             try {
@@ -257,7 +257,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[28] = op_decc;
+        this.instructions[0x1c] = op_decc;
 
         let op_slr = ( flag, op1, op2, op3 ) => {
             try {
@@ -348,9 +348,9 @@ export default class nlp16 {
 
         let op_push = ( flag, op1, op2, op3 ) => {
             try {
-                let result = this.register[ this.sp ] - 1;
-                this.store_register( this.sp, result );
-                this.store_memory( result, op1 );
+                let result = this.register[ this.reg_sp ] - 1;
+                this.store_register( this.reg_sp, result );
+                this.store_memory( result, this.register[ op1 ] );
             } catch( err ) {
                 throw err;
             }
@@ -359,10 +359,11 @@ export default class nlp16 {
 
         let op_pop = ( flag, op1, op2, op3 ) => {
             try {
-                let result1 = this.memory[ this.register[ this.sp ] ];
+                let result1 = this.memory[ this.register[ this.reg_sp ] ];
                 this.store_register( op1, result1 );
-                let result2 = this.register[ this.sp ] + 1;
-                this.store_register( this.sp, result2 );
+                let result2 = this.register[ this.reg_sp ] + 1;
+                this.store_register( this.reg_sp, result2 );
+                console.log({ op1, result1, result2 })
             } catch( err ) {
                 throw err;
             }
@@ -371,10 +372,10 @@ export default class nlp16 {
 
         let op_call = ( flag, op1, op2, op3 ) => {
             try {
-                let new_sp = this.register[ this.sp ] - 1;
-                this.store_register( this.sp, new_sp );
-                this.store_memory( this.register[ this.sp ], this.ip );
-                this.store_register( this.ip, op1 );
+                let new_sp = this.register[ this.reg_sp ] - 1;
+                this.store_register( this.reg_sp, new_sp );
+                this.store_memory( this.register[ this.reg_sp ], op2 );
+                this.store_register( this.reg_ip, op1 );
             } catch( err ) {
                 throw err;
             }
@@ -383,11 +384,11 @@ export default class nlp16 {
 
         let op_calladd = ( flag, op1, op2, op3 ) => {
             try {
-                let new_sp = this.register[ this.sp ] - 1;
-                this.store_register( this.sp, new_sp );
-                this.store_memory( this.register[ this.sp ], this.ip );
+                let new_sp = this.register[ this.reg_sp ] - 1;
+                this.store_register( this.reg_sp, new_sp );
+                this.store_memory( this.register[ this.reg_sp ], op2 );
                 let result = op2 + op3;
-                this.store_register( this.ip, op1 );
+                this.store_register( op1, result );
             } catch( err ) {
                 throw err;
             }
@@ -397,10 +398,10 @@ export default class nlp16 {
         let op_callsub = ( flag, op1, op2, op3 ) => {
             try {
                 let new_sp = this.register[ this.sp ] - 1;
-                this.store_register( this.sp, new_sp );
-                this.store_memory( this.register[ this.sp ], this.ip );
+                this.store_register( this.reg_sp, new_sp );
+                this.store_memory( this.register[ this.reg_sp ], this.reg_ip );
                 let result = op1 + op2;
-                this.store_register( this.ip, op1 );
+                this.store_register( this.reg_ip, op1 );
             } catch( err ) {
                 throw err;
             }
@@ -409,15 +410,17 @@ export default class nlp16 {
 
         let op_ret = ( flag, op1, op2, op3 ) => {
             try {
-                let new_ip = this.memory( this.register[ this.sp ] );
-                let new_sp = this.register[ this.sp ] + 1;
-                this.store_register( this.sp, new_sp );
-                this.store_register( this.ip, new_ip );
+                let new_ip = this.memory[ this.register[ this.reg_sp ] ];
+                let new_sp = this.register[ this.reg_sp ] + 1;
+                this.store_register( this.reg_sp, new_sp );
+                this.store_register( this.reg_ip, new_ip );
             } catch( err ) {
+                console.log("retでエラー");
+                console.log(err);
                 throw err;
             }
         }
-        this.instructions[0xc0] = op_ret;
+        //this.instructions[0xc0] = op_ret;
         this.instructions[0xe0] = op_ret;   // reti
 
         let op_load = ( flag, op1, op2, op3 ) => {
@@ -537,9 +540,11 @@ export default class nlp16 {
             let [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ] = this.decode();
             yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
             this.update_ip( ip_count );
+            console.log(this.changes);
             try {
                 this.exec( opcode, flag, op1, op2, op3 );
                 yield this.changes;
+                console.log( this.register );
             } catch( err ) {
                 throw err;
             }
@@ -571,7 +576,7 @@ export default class nlp16 {
 
         // 1 word instruction POP(RET) / PUSH / RETI
         if( opcode == 0xc0 || opcode == 0xd0 || opcode == 0xe0 ) {
-            return [ ip_count, ip, opcode, flag, this.register[this.reg_ip], null, null ];
+            return [ ip_count, ip, opcode, flag, op1, null, null, ir1, null, null ];
         }
 
         // 2 or 3 words instruction
@@ -606,6 +611,7 @@ export default class nlp16 {
      * @param {Number} count 
      */
     update_ip( count ) {
+        console.log( this.changes );
         this.store_register( this.reg_ip, this.register[this.reg_ip] + count );
     }
 
@@ -637,6 +643,8 @@ export default class nlp16 {
                 this.instructions[opcode](this.register[this.reg_flag], op1, op2, op3);
             } catch( err ) {
                 if( err instanceof TypeError ) {
+                    console.log({opcode,flag,op1,op2,op3});
+                    console.log(this.instructions[opcode]);
                     throw new UnasignedInstructionError('Unasigned instruction error');
                 } else throw err;
             }
@@ -752,7 +760,6 @@ export default class nlp16 {
      * @param {Number} value 
      */
     store_flag( old, value ) {
-        console.log( {value})
         this.register[ this.reg_flag ] = value;
         this.changes[ "register" ].push( { id: this.reg_flag, from: old, to: value } );
         this.changes[ "flag" ] = { id: this.reg_flag, from: old, to: value };
@@ -764,8 +771,8 @@ export default class nlp16 {
      * @param {Number} value 
      */
     store_memory( address, value ) {
-        let from = this.address[ address ];
-        this.address[ address ] = value;
+        let from = this.memory[ address ];
+        this.memory[ address ] = value;
         this.changes[ "memory" ] = { address: address, from: from, to: value };
     }
 }
