@@ -1,8 +1,27 @@
+/**
+ * NLP-16 CPUエミュレータ本体
+ */
 export default class nlp16 {
+    /**
+     * コンストラクタ
+     * メモリ領域の取得，レジスタの配置，命令セットの定義
+     */
     constructor() {
+        /**
+         * メモリ
+         * @type {Array}
+         */
         this.memory = new Uint16Array(16*1024);
+        /**
+         * レジスタ
+         * @type {Array}
+         */
         this.register = new Uint16Array(16);
 
+        /**
+         * class内で使用するレジスタ名とレジスタ番号の対応
+         * @type {Number}
+         */
         this.reg_ir1 = 0;
         this.reg_ir2 = 1;
         this.reg_ir3 = 2;
@@ -20,18 +39,26 @@ export default class nlp16 {
         this.reg_sp = 14;
         this.reg_zero = 15;
 
+        /**
+         * class内で使用するフラグ名とビットの対応
+         * @type {Number}
+         */
         this.flag_c = 1;
         this.flag_v = 2;
         this.flag_z = 4;
         this.flag_s = 8;
 
+        /**
+         * 命令を実行することによって変更されるレジスタ・メモリ
+         */
         this.changes = {};
         this.changes[ "register" ] = [];
 
         this.define_instructions();
-        console.log( "32" );
-        console.log( this.instructions );
     }
+    /**
+     * 命令セットの定義
+     */
     define_instructions() {
         this.instructions = {};
         let op_mov = ( flag, op1, op2, op3 ) => {
@@ -455,9 +482,9 @@ export default class nlp16 {
 
     /**
      * プログラムのロード
-     * @param {number} address ロードするアドレス
+     * @param {Number} address ロードするアドレス
      * @param {Uint16Array} data ロードするデータ
-     * @param {number} size ロードするサイズ
+     * @param {Number} size ロードするサイズ
      */
     load_binary( address, data, size ) {
         for( let i=0; i<size; i++ ) {
@@ -465,6 +492,10 @@ export default class nlp16 {
         }
     }
 
+    /**
+     * プログラムの実行
+     * @param {Number} address 実行開始するアドレス
+     */
     run( address ) {
         this.change_ip( address );
         while(true) {
@@ -494,6 +525,10 @@ export default class nlp16 {
         }
     }
 
+    /**
+     * 外部で制御しながらプログラムを実行する
+     * @param {Number} address エントリーポイントのアドレス
+     */
     *web_run( address ) {
         this.change_ip( address );
         while(true) {
@@ -514,7 +549,14 @@ export default class nlp16 {
 
     /**
      * 命令をデコードする
-     * @returns op2, op3は，値を返している
+     * @returns 配列内に以下の情報が入っている
+     * ip_count 命令のワード数
+     * ip 次に実行するアドレス
+     * opcode 実行する命令
+     * flag 現在のフラグ
+     * op1 結果を代入するレジスタ（1word命令だと異なる場合アリ）
+     * op2 値（レジスタ/アドレスが指定されていても値が返される）
+     * op3 値（レジスタ/アドレスが指定されていても値が返される）
      */
     decode() {
         let ip = this.register[ this.reg_ip ]; // Instruction Pointer
@@ -556,21 +598,29 @@ export default class nlp16 {
         return [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ];
     }
 
+    /**
+     * IPレジスタにcountを足す（更新する）
+     * @param {Number} count 
+     */
     update_ip( count ) {
         this.store_register( this.reg_ip, this.register[this.reg_ip] + count );
     }
 
+    /**
+     * IPレジスタにaddressを代入する
+     * @param {Number} address 
+     */
     change_ip( address ) {
         this.store_register( this.reg_ip, address );
     }
 
     /**
-     * 実行条件をチェックして命令を実行します
-     * @param {number} opcode 実行する命令
-     * @param {number} flag 実行条件
-     * @param {number} op1 オペランド1（たいていはdestination）
-     * @param {number} op2 オペランド2
-     * @param {number} op3 オペランド3（存在しない場合はnull）
+     * 実行条件をチェックして命令を実行する
+     * @param {Number} opcode 実行する命令
+     * @param {Number} flag 実行条件
+     * @param {Number} op1 オペランド1（たいていはdestination）
+     * @param {Number} op2 オペランド2
+     * @param {Number} op3 オペランド3（存在しない場合はnull）
      */
     exec( opcode, flag, op1, op2, op3 ) {
         let result = true;
@@ -593,8 +643,8 @@ export default class nlp16 {
     }
 
     /**
-     * フラグが実行条件と合致するか調べる
-     * @param {number} flag 実行条件
+     * 命令内のフラグ領域が実行条件と合致するか調べる
+     * @param {Number} flag 実行条件
      * @return {boolean} 実行するか（する場合true）
      */
     check_flag( flag ) {
@@ -635,6 +685,12 @@ export default class nlp16 {
         }
     }
 
+    /**
+     * レジスタに値を代入し，this.changesに反映させる
+     * 代入できないレジスタの場合はErrorを投げる
+     * @param {Number} register レジスタID
+     * @param {Number} value 代入する値
+     */
     store_register( register, value ) {
         let from = this.register[ register ];
         value &= 0xffff;
@@ -686,12 +742,24 @@ export default class nlp16 {
                 throw new IllegalRegisterError('レジスタ名が異常です\nregister_id: ' + register );
         }
     }
+
+    /**
+     * フラグを変更し，変更前の情報とともにthis.changesに反映させる
+     * @param {Number} old 
+     * @param {Number} value 
+     */
     store_flag( old, value ) {
         console.log( {value})
         this.register[ this.reg_flag ] = value;
         this.changes[ "register" ].push( { id: this.reg_flag, from: old, to: value } );
         this.changes[ "flag" ] = { id: this.reg_flag, from: old, to: value };
     }
+
+    /**
+     * メモリの内容を変更し，変更前の情報とともにthis.changesに反映させる
+     * @param {Number} address 
+     * @param {Number} value 
+     */
     store_memory( address, value ) {
         let from = this.address[ address ];
         this.address[ address ] = value;
@@ -699,6 +767,9 @@ export default class nlp16 {
     }
 }
 
+/**
+ * 未定義命令エラー
+ */
 class UnasignedInstructionError extends Error {
     constructor(...params) {
         super(...params);
@@ -709,6 +780,9 @@ class UnasignedInstructionError extends Error {
     }
 }
 
+/**
+ * 未定義実行時フラグエラー
+ */
 class UnasignedFlagError extends Error {
     constructor(...params) {
         super(...params);
@@ -719,6 +793,9 @@ class UnasignedFlagError extends Error {
     }
 }
 
+/**
+ * レジスタエラー
+ */
 class IllegalRegisterError extends Error {
     constructor(...params) {
         super(...params);
