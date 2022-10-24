@@ -285,7 +285,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x20] = op_sar;
+        this.instructions[0x20] = op_sll;
 
         let op_sar = ( flag, op1, op2, op3 ) => {
             try {
@@ -367,7 +367,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0xd0] = op_push;
+        this.instructions[0xc0] = op_pop;
 
         let op_call = ( flag, op1, op2, op3 ) => {
             try {
@@ -407,7 +407,7 @@ export default class nlp16 {
         }
         this.instructions[0xb9] = op_callsub;
 
-        let ret = ( flag, op1, op2, op3 ) => {
+        let op_ret = ( flag, op1, op2, op3 ) => {
             try {
                 let new_ip = this.memory( this.register[ this.sp ] );
                 let new_sp = this.register[ this.sp ] + 1;
@@ -579,11 +579,13 @@ export default class nlp16 {
         ip_count++;
         let op2 = (ir2 >> 12) & 15;
         let op3 = (ir2 >> 8 ) & 15;
+        if( ( op2 == 2 ) || ( op3 == 2 ) ) ip_count++;
         if( op2 == 1 ) op2 = ir2 & 255;
         else if( op2 == 2 ) {
             op2 = ir3;
             this.register[this.reg_ir3] = ir3;
-            ip_count++;
+        } else if( op2 == this.reg_ip ) {
+            op2 = this.register[op2] + ip_count;
         } else {
             op2 = this.register[op2];
         }
@@ -591,7 +593,8 @@ export default class nlp16 {
         else if( op3 == 2 ) {
             op3 = ir3;
             this.register[this.reg_ir3] = ir3;
-            ip_count++;
+        } else if( op3 == this.reg_ip ) {
+            op3 = this.register[op3] + ip_count;
         } else {
             op3 = this.register[op3];
         }
