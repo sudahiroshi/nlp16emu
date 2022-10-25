@@ -52,10 +52,10 @@ export default class nlp16 {
          * 命令を実行することによって変更されるレジスタ・メモリ
          */
         this.changes = {};
-        this.changes[ "register" ] = [];
+        this.changes[ "register" ] = {};
 
         this.define_instructions();
-        console.log(this.instructions);
+        //console.log(this.instructions);
     }
     /**
      * 命令セットの定義
@@ -363,7 +363,6 @@ export default class nlp16 {
                 this.store_register( op1, result1 );
                 let result2 = this.register[ this.reg_sp ] + 1;
                 this.store_register( this.reg_sp, result2 );
-                console.log({ op1, result1, result2 })
             } catch( err ) {
                 throw err;
             }
@@ -415,8 +414,6 @@ export default class nlp16 {
                 this.store_register( this.reg_sp, new_sp );
                 this.store_register( this.reg_ip, new_ip );
             } catch( err ) {
-                console.log("retでエラー");
-                console.log(err);
                 throw err;
             }
         }
@@ -505,7 +502,7 @@ export default class nlp16 {
             let [ ip_count, ip, opcode, flag, op1, op2, op3 ] = this.decode();
             this.update_ip( ip_count );
             try {
-                console.log( {ip, opcode, flag, op1, op2, op3})
+                //console.log( {ip, opcode, flag, op1, op2, op3})
                 this.exec( opcode, flag, op1, op2, op3 );
             } catch( err ) {
                 if( err instanceof UnasignedInstructionError ) {
@@ -536,15 +533,14 @@ export default class nlp16 {
         this.change_ip( address );
         while(true) {
             this.changes = {};
-            this.changes[ "register" ] = [];
+            this.changes[ "register" ] = {};
             let [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ] = this.decode();
             yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
             this.update_ip( ip_count );
-            console.log(this.changes);
+            //console.log(this.changes);
             try {
                 this.exec( opcode, flag, op1, op2, op3 );
                 yield this.changes;
-                console.log( this.register );
             } catch( err ) {
                 throw err;
             }
@@ -611,7 +607,6 @@ export default class nlp16 {
      * @param {Number} count 
      */
     update_ip( count ) {
-        console.log( this.changes );
         this.store_register( this.reg_ip, this.register[this.reg_ip] + count );
     }
 
@@ -712,7 +707,7 @@ export default class nlp16 {
                 throw new IllegalRegisterError('IR1-3に書き込もうとしました');
                 break;
             case this.reg_iv:
-                this.changes[ "register" ].push( { id: register, from: from, to: value } );
+                this.changes[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ this.reg_iv ] = value;
                 break;
             case this.reg_4:
@@ -722,12 +717,12 @@ export default class nlp16 {
             case this.reg_b:
             case this.reg_c:
             case this.reg_d:
-                this.changes[ "register" ].push( { id: register, from: from, to: value } );
+                this.changes[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_e:
                 console.log( "e: " + (value & 0xff ));
-                this.changes[ "register" ].push( { id: register, from: from, to: value } );
+                this.changes[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = (value & 0xff );
                 break;
             case this.reg_mem:
@@ -740,11 +735,11 @@ export default class nlp16 {
                 this.register[ register ] = value;
                 break;
             case this.reg_ip:
-                this.changes[ "register" ].push( { id: register, from: from, to: value } );
+                this.changes[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_sp:
-                this.changes[ "register" ].push( { id: register, from: from, to: value } );
+                this.changes[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_zero:
@@ -761,7 +756,7 @@ export default class nlp16 {
      */
     store_flag( old, value ) {
         this.register[ this.reg_flag ] = value;
-        this.changes[ "register" ].push( { id: this.reg_flag, from: old, to: value } );
+        this.changes[ "register" ][this.reg_flag] = { id: this.reg_flag, from: old, to: value };
         this.changes[ "flag" ] = { id: this.reg_flag, from: old, to: value };
     }
 
@@ -773,7 +768,8 @@ export default class nlp16 {
     store_memory( address, value ) {
         let from = this.memory[ address ];
         this.memory[ address ] = value;
-        this.changes[ "memory" ] = { address: address, from: from, to: value };
+        this.changes.memory |= {};
+        this.changes[ "memory" ][ address ] = { address: address, from: from, to: value };
     }
 }
 

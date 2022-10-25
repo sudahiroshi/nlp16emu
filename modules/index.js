@@ -83,7 +83,7 @@ next.addEventListener('click', () => {
             for( let elm of document.querySelectorAll('.reg_value') ) {
                 elm.classList.remove('exec');
             }
-            for( let reg of result2.value["register"] ) {
+            for( let [number, reg] of Object.entries(result2.value["register"]) ) {
                 let reg_element = document.querySelector('#reg_'+reg.id );
                 reg_element.innerText = padding( reg.to );
                 reg_element.classList.add('exec');
