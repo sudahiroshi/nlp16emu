@@ -97,12 +97,11 @@ export default class nlp16 {
         let op_sub = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
-                let neg_op3 = -op3;
-                let result = op2 + neg_op3;
+                let result = op2 - op3;
                 // 負数+負数->正数 または 正数+正数->負数 のときSフラグが立つ
                 if(
-                    ((op2>0x8000)&&(neg_op3>0x8000)&&(result<0x8000)) ||
-                    ((op2<0x8000)&&(neg_op3<0x8000)&&(result>=0x8000)) ) {
+                    ((op2<0x8000)&&(op3>=0x8000)&&(result<0)) ||
+                    ((op2<0x8000)&&(op3>=0x8000)&&(result>=0x8000)) ) {
                     new_flag |= this.flag_v;
                 }
                 // 17bit目に1が立つときCフラグが立つ
