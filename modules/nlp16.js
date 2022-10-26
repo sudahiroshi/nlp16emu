@@ -261,7 +261,7 @@ export default class nlp16 {
         let op_slr = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
-                let result = op2 >> 1;
+                let result = op2 >>> 1;
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
                 if( result == 0 )    new_flag |= this.flag_z;
                 this.store_register( op1, result );
@@ -333,7 +333,7 @@ export default class nlp16 {
         let op_rol = ( flag, op1, op2, op3 ) => {
             try {
                 let new_flag = 0;
-                let result = (op2 << 1) & 0x8000;
+                let result = (op2 << 1) & 0xffff;
                 if( op2 & 0x8000 ) result |= 1;
                 if( result >= 0x8000 )  new_flag |= this.flag_s;
                 if( result == 0 )    new_flag |= this.flag_z;
@@ -643,7 +643,7 @@ export default class nlp16 {
                 } else throw err;
             }
         } else {
-            console.log("skiped");
+            console.log("skiped by " + flag);
         }
     }
 
