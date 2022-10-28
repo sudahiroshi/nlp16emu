@@ -55,7 +55,7 @@ export default class nlp16 {
         this.changes[ "register" ] = {};
 
         this.define_instructions();
-        //console.log(this.instructions);
+        console.log(this.instructions);
     }
     /**
      * 命令セットの定義
@@ -767,8 +767,8 @@ export default class nlp16 {
     store_memory( address, value ) {
         let from = this.memory[ address ];
         this.memory[ address ] = value;
-        this.changes.memory |= {};
-        this.changes[ "memory" ][ address ] = { address: address, from: from, to: value };
+        if( !("memory" in this.changes) )   this.changes.memory = {};
+        this.changes.memory[ address ] = { address: address, from: from, to: value };
     }
 }
 
