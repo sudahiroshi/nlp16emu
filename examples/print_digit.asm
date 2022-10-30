@@ -1,11 +1,13 @@
-    .origin 0x0
+    .origin 0x0010
     mov sp, 0x100
-    mov a, 0x10
+    mov a, 0x11
     push a
-    mov a, 2
+    mov a, 3
     push a
     call @div
     #call @print_digit
+    mov a, 0xffff  # ダミー
+    mov a, 0xffff
     .dw 0xffff
     .dw 0xffff
 # aレジスタに入っている値（0-65535）をASCIIコードに直して表示する
@@ -19,12 +21,12 @@ print_digit:
     .dw 0xffff
     .dw 0xffff
 
-# (sp+1) / (sp+2) を計算し，aレジスタに商を，bレジスタに余りを返す
+# (sp+2) / (sp+1) を計算し，aレジスタに商を，bレジスタに余りを返す
 div:
     push c
     push d
-    load c, sp + 4
-    load d, sp + 3
+    load c, sp + 4  # c,dレジスタをpushしているのでその分ずれている
+    load d, sp + 3  # 同上
     mov a, 0
 divloop:
     inc a, a
@@ -35,8 +37,8 @@ divloop:
     jmp @divloop
 
 end:
-    add b, c, d  # 引きすぎたdを足す
-    dec a, a
+    dec a, a  # 足しすぎた回数(a)から1引く
+    mov b, c  # 余りをbに入れる（最初からbレジスタを使えばよかった）
     pop d
     pop c
     ret

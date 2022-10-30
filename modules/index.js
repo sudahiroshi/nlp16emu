@@ -8,6 +8,7 @@ let bin = document.querySelector('#bin');
 let text = document.querySelector('#text');
 let reset = document.querySelector('#reset');
 let next = document.querySelector('#next');
+let runto = document.querySelector('#runto');
 let con = document.querySelector('#console_main');
 let executable_bin;
 let size;
@@ -54,15 +55,76 @@ text.addEventListener('change', async(ev) => {
 });
 
 reset.addEventListener('click', () => {
-    cpu = x.web_run(0);
+    cpu = x.web_run( 0 );
+    x.add_break_point( 0x0b );
 });
 
 next.addEventListener('click', () => {
     let result1, result2;
     try {
-        result1 = cpu.next();
+        result1 = cpu.next( "step" );
         console.log( {result1} );
-        result2 = cpu.next();
+        result2 = cpu.next( "step" );
+        console.log( {result2} );
+        //console.log( {result1, result2});
+        document.querySelector('#reg_0').innerText = padding(result1.value.ir1);
+        document.querySelector('#reg_1').innerText = padding(result1.value.ir2);
+        document.querySelector('#reg_2').innerText = padding(result1.value.ir3);
+        document.querySelector('#reg_13').innerText = padding(result1.value.ip);
+        let ip = result1.value.ip;
+        let ip_count = result1.value.ip_count;
+        let memory_view = document.querySelector('#memory_view1');
+        for( let add = old_addr[0]; add<old_addr[0]+old_addr[1]; add++ ) {
+            memory_view.querySelector(`tr:nth-child(${add+1})`).classList.remove('exec');
+        }
+        old_addr = [ ip, ip_count ];
+        for( let add = ip; add<ip + ip_count; add++ ) {
+            memory_view.querySelector(`tr:nth-child(${add+1})`).classList.add('exec');
+        }
+        if( "register" in result2.value ) {
+            for( let elm of document.querySelectorAll('.reg_value') ) {
+                elm.classList.remove('exec');
+            }
+            for( let [number, reg] of Object.entries(result2.value["register"]) ) {
+                let reg_element = document.querySelector('#reg_'+reg.id );
+                reg_element.innerText = padding( reg.to );
+                reg_element.classList.add('exec');
+                if( reg.id == 9 ) {
+                    con.innerText += String.fromCharCode( reg.to );
+                }
+            }
+        }
+        if( "flag" in result2.value ) {
+            let flag = result2.value["flag"]["to"];
+            if( flag & 8 ){
+
+                document.querySelector('#flag_s').classList.add('indicator_on');
+            } 
+            else {
+                document.querySelector('#flag_s').classList.remove('indicator_on');
+            }
+            if( flag & 4 ) document.querySelector('#flag_z').classList.add('indicator_on');
+            else document.querySelector('#flag_z').classList.remove('indicator_on');
+            if( flag & 2 ) document.querySelector('#flag_v').classList.add('indicator_on');
+            else document.querySelector('#flag_v').classList.remove('indicator_on');
+            if( flag & 1 ) document.querySelector('#flag_c').classList.add('indicator_on');
+            else document.querySelector('#flag_c').classList.remove('indicator_on');
+        }
+    } catch( err ) {
+        console.log( err );
+        console.log( {result1, result2 });
+        document.querySelector('#terminate').classList.remove('normal');
+        document.querySelector('#terminate').classList.add('terminate');
+        document.querySelector('#reason').innerText = err.message;
+    }
+});
+
+runto.addEventListener('click', () => {
+    let result1, result2;
+    try {
+        result1 = cpu.next( "break" );
+        console.log( {result1} );
+        result2 = cpu.next( "break" );
         console.log( {result2} );
         //console.log( {result1, result2});
         document.querySelector('#reg_0').innerText = padding(result1.value.ir1);

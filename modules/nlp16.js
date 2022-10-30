@@ -54,8 +54,13 @@ export default class nlp16 {
         this.changes = {};
         this.changes[ "register" ] = {};
 
+        // 命令の定義
+        // 命令はthis.instructions (連想配列) に代入される
         this.define_instructions();
-        console.log(this.instructions);
+
+        // ブレークポイント
+        this.break_points = [];
+
     }
     /**
      * 命令セットの定義
@@ -372,8 +377,8 @@ export default class nlp16 {
             try {
                 let new_sp = this.register[ this.reg_sp ] - 1;
                 this.store_register( this.reg_sp, new_sp );
-                this.store_memory( this.register[ this.reg_sp ], op2 );
-                this.store_register( this.reg_ip, op1 );
+                this.store_memory( this.register[ this.reg_sp ], op1 );
+                this.store_register( this.reg_ip, op2 );
             } catch( err ) {
                 throw err;
             }
@@ -530,20 +535,89 @@ export default class nlp16 {
      */
     *web_run( address ) {
         this.change_ip( address );
+        /**
+         * 動作モード
+         * @type {String}
+         * "step": ステップ実行
+         * "break": ブレークポイントまで実行
+         * "eternal": ずっと実行
+         */
+        let mode = "step";
         while(true) {
             this.changes = {};
             this.changes[ "register" ] = {};
             let [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ] = this.decode();
-            yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
+            console.log( {mode} );
+            if( mode=="step" ) mode = yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
             this.update_ip( ip_count );
             //console.log(this.changes);
             try {
                 this.exec( opcode, flag, op1, op2, op3 );
-                yield this.changes;
+                if( mode=="step" ) yield this.changes;
+                else if( ( mode=="break") && ( this.break_points.includes( ip )) ) {
+                    yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
+                    yield this.changes;
+                }
             } catch( err ) {
                 throw err;
             }
 
+        }
+    }
+
+    /**
+     * ブレークポイントの追加
+     * @param {Number} address ブレークポイント
+     * @returns すでに登録されているアドレスの場合false，それ以外はtrue
+     */
+    add_break_point( address ) {
+        if( this.break_points.includes( address ) ) return false;
+        this.break_points.push( address );
+        return true;
+    }
+
+    /**
+     * ブレークポイントを削除する
+     * @param {Number} address 削除するブレークポイントのアドレス
+     * @returns アドレスを消した場合true，それ以外はfalse
+     */
+    delete_break_point( address ) {
+        if( this.break_points.includes( address ) ) {
+            // そのアドレスを消す処理を後で追加する
+            return true;
+        }
+        else    return false;
+    }
+
+    /**
+     * ブレークポイントで与えられたアドレスまでプログラムを実行する
+     * @param {Number} address エントリーポイントのアドレス
+     * @param {Array} break_points ブレークポイントの配列
+     */
+    *run_to( address, break_points ) {
+        this.change_ip( address );
+        this.changes = {};
+        this.changes[ "register" ] = {};
+        while(true) {
+            this.changes = {};
+            this.changes[ "register" ] = {};
+            let [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ] = this.decode();
+            //yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
+            console.log( { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 } );
+            this.update_ip( ip_count );
+            //console.log(this.changes);
+            try {
+                this.exec( opcode, flag, op1, op2, op3 );
+                //yield this.changes;
+                let a = this.changes;
+                console.log( a );
+            } catch( err ) {
+                throw err;
+            }
+            if( break_points.includes( ip ) ) {
+                yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
+                yield this.changes;
+            }
         }
     }
 
@@ -570,11 +644,15 @@ export default class nlp16 {
         let ip_count = 1;
 
         // 1 word instruction POP(RET) / PUSH / RETI
+        // ir1 -> opcode(16bit) flag(8bit) op1(8bit)
         if( opcode == 0xc0 || opcode == 0xd0 || opcode == 0xe0 ) {
             return [ ip_count, ip, opcode, flag, op1, null, null, ir1, null, null ];
         }
 
         // 2 or 3 words instruction
+        // ir1 -> opcode(8bit) flag(4bit) op1(4bit)
+        // ir2 -> op2(4bit) op3(4bit) immidiate1(8bit)
+        // ir3 -> immidiate2(16bit)
         this.register[this.reg_ir2] = ir2 & 255;
         ip_count++;
         let op2 = (ir2 >> 12) & 15;
@@ -697,6 +775,7 @@ export default class nlp16 {
      * @param {Number} value 代入する値
      */
     store_register( register, value ) {
+        console.log( { register, value });
         let from = this.register[ register ];
         value &= 0xffff;
         switch( register ) {
@@ -746,6 +825,7 @@ export default class nlp16 {
             default:
                 throw new IllegalRegisterError('レジスタ名が異常です\nregister_id: ' + register );
         }
+        console.log( this.changes );
     }
 
     /**
