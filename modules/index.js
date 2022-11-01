@@ -56,7 +56,7 @@ text.addEventListener('change', async(ev) => {
 
 reset.addEventListener('click', () => {
     cpu = x.web_run( 0 );
-    x.add_break_point( 0x0b );
+    x.add_break_point( 0x06 );
 });
 
 next.addEventListener('click', () => {
