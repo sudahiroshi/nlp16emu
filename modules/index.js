@@ -3,6 +3,7 @@ import nlp16 from "./nlp16.js";
 console.log("start");
 let x = new nlp16();
 let cpu;
+let first_break = true;
 
 let bin = document.querySelector('#bin');
 let text = document.querySelector('#text');
@@ -56,7 +57,15 @@ text.addEventListener('change', async(ev) => {
 
 reset.addEventListener('click', () => {
     cpu = x.web_run( 0 );
-    x.add_break_point( 0x0b );
+    let addresses = document.querySelectorAll('.address');
+    for( let add of addresses ) {
+        add.addEventListener('click', (ev) => {
+            ev.target.classList.add('breakpoint');
+            x.add_break_point( parseInt( ev.target.innerText, 16 ) );
+        });
+    }
+    first_break = true;
+    //x.add_break_point( 0x06 );
 });
 
 next.addEventListener('click', () => {
@@ -122,17 +131,20 @@ next.addEventListener('click', () => {
 runto.addEventListener('click', () => {
     let result1, result2;
     try {
-        result1 = cpu.next( "break" );
-        console.log( {result1} );
+        if( first_break ) {
+            result1 = cpu.next( "break" );
+            first_break = false;
+            console.log( {result1} );
+        }
         result2 = cpu.next( "break" );
         console.log( {result2} );
         //console.log( {result1, result2});
-        document.querySelector('#reg_0').innerText = padding(result1.value.ir1);
-        document.querySelector('#reg_1').innerText = padding(result1.value.ir2);
-        document.querySelector('#reg_2').innerText = padding(result1.value.ir3);
-        document.querySelector('#reg_13').innerText = padding(result1.value.ip);
-        let ip = result1.value.ip;
-        let ip_count = result1.value.ip_count;
+        document.querySelector('#reg_0').innerText = padding(result2.value.ir1);
+        document.querySelector('#reg_1').innerText = padding(result2.value.ir2);
+        document.querySelector('#reg_2').innerText = padding(result2.value.ir3);
+        document.querySelector('#reg_13').innerText = padding(result2.value.ip);
+        let ip = result2.value.ip;
+        let ip_count = result2.value.ip_count;
         let memory_view = document.querySelector('#memory_view1');
         for( let add = old_addr[0]; add<old_addr[0]+old_addr[1]; add++ ) {
             memory_view.querySelector(`tr:nth-child(${add+1})`).classList.remove('exec');
@@ -141,11 +153,11 @@ runto.addEventListener('click', () => {
         for( let add = ip; add<ip + ip_count; add++ ) {
             memory_view.querySelector(`tr:nth-child(${add+1})`).classList.add('exec');
         }
-        if( "register" in result2.value ) {
+        if( "register" in result2.value.chall ) {
             for( let elm of document.querySelectorAll('.reg_value') ) {
                 elm.classList.remove('exec');
             }
-            for( let [number, reg] of Object.entries(result2.value["register"]) ) {
+            for( let [number, reg] of Object.entries(result2.value.chall["register"]) ) {
                 let reg_element = document.querySelector('#reg_'+reg.id );
                 reg_element.innerText = padding( reg.to );
                 reg_element.classList.add('exec');
@@ -154,8 +166,8 @@ runto.addEventListener('click', () => {
                 }
             }
         }
-        if( "flag" in result2.value ) {
-            let flag = result2.value["flag"]["to"];
+        if( "flag" in result2.value.chall ) {
+            let flag = result2.value.chall["flag"]["to"];
             if( flag & 8 ){
 
                 document.querySelector('#flag_s').classList.add('indicator_on');
@@ -172,7 +184,7 @@ runto.addEventListener('click', () => {
         }
     } catch( err ) {
         console.log( err );
-        console.log( {result1, result2 });
+        console.log( {result2 });
         document.querySelector('#terminate').classList.remove('normal');
         document.querySelector('#terminate').classList.add('terminate');
         document.querySelector('#reason').innerText = err.message;

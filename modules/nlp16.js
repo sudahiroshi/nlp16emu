@@ -53,20 +53,26 @@ export default class nlp16 {
          */
         this.changes = {};
         this.changes[ "register" ] = {};
+        this.change_all = {};
+        this.change_all[ "register" ] = {};
 
         // 命令の定義
-        // 命令はthis.instructions (連想配列) に代入される
-        this.define_instructions();
+        // 命令はinstructions (連想配列) に代入される
+        this.instructions = this.define_instructions();
 
-        // ブレークポイント
+        /**
+         * ブレークポイント
+         * @type {Array<Number>}
+         */
         this.break_points = [];
 
     }
     /**
      * 命令セットの定義
+     * @return {Object} 命令セット
      */
     define_instructions() {
-        this.instructions = {};
+        let instructions = {};
         let op_mov = ( flag, op1, op2, op3 ) => {
             try {
                 this.store_register( op1, op2 );
@@ -74,7 +80,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0] = op_mov;
+        instructions[0] = op_mov;
 
         let op_add = ( flag, op1, op2, op3 ) => {
             try {
@@ -97,7 +103,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x12] = op_add;
+        instructions[0x12] = op_add;
 
         let op_sub = ( flag, op1, op2, op3 ) => {
             try {
@@ -120,7 +126,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x11] = op_sub;
+        instructions[0x11] = op_sub;
 
         let op_addc = ( flag, op1, op2, op3 ) => {
             try {
@@ -144,7 +150,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x16] = op_addc;
+        instructions[0x16] = op_addc;
 
         let op_subc = ( flag, op1, op2, op3 ) => {
             try {
@@ -169,7 +175,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x15] = op_subc;
+        instructions[0x15] = op_subc;
 
         let op_or = ( flag, op1, op2, op3 ) => {
             try {
@@ -183,7 +189,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x0a] = op_or;
+        instructions[0x0a] = op_or;
 
         let op_not = ( flag, op1, op2, op3 ) => {
             try {
@@ -197,7 +203,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x0c] = op_not;
+        instructions[0x0c] = op_not;
 
         let op_xor = ( flag, op1, op2, op3 ) => {
             try {
@@ -211,7 +217,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x0e] = op_xor;
+        instructions[0x0e] = op_xor;
 
         let op_and = ( flag, op1, op2, op3 ) => {
             try {
@@ -225,7 +231,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x06] = op_and;
+        instructions[0x06] = op_and;
 
         let op_inc = ( flag, op1, op2, op3 ) => {
             try {
@@ -234,7 +240,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x1b] = op_inc;
+        instructions[0x1b] = op_inc;
 
         let op_dec = ( flag, op1, op2, op3 ) => {
             try {
@@ -243,7 +249,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x18] = op_dec;
+        instructions[0x18] = op_dec;
 
         let op_incc = ( flag, op1, op2, op3 ) => {
             try {
@@ -252,7 +258,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x1f] = op_incc;
+        instructions[0x1f] = op_incc;
 
         let op_decc = ( flag, op1, op2, op3 ) => {
             try {
@@ -261,7 +267,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x1c] = op_decc;
+        instructions[0x1c] = op_decc;
 
         let op_slr = ( flag, op1, op2, op3 ) => {
             try {
@@ -275,7 +281,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x28] = op_slr;
+        instructions[0x28] = op_slr;
 
         let op_sll = ( flag, op1, op2, op3 ) => {
             try {
@@ -289,7 +295,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x20] = op_sll;
+        instructions[0x20] = op_sll;
 
         let op_sar = ( flag, op1, op2, op3 ) => {
             try {
@@ -304,7 +310,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x2c] = op_sar;
+        instructions[0x2c] = op_sar;
 
         let op_sal = ( flag, op1, op2, op3 ) => {
             try {
@@ -318,7 +324,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x24] = op_sal;
+        instructions[0x24] = op_sal;
 
         let op_ror = ( flag, op1, op2, op3 ) => {
             try {
@@ -333,7 +339,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x2a] = op_ror;
+        instructions[0x2a] = op_ror;
 
         let op_rol = ( flag, op1, op2, op3 ) => {
             try {
@@ -348,7 +354,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x22] = op_rol;
+        instructions[0x22] = op_rol;
 
         let op_push = ( flag, op1, op2, op3 ) => {
             try {
@@ -359,7 +365,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0xd0] = op_push;
+        instructions[0xd0] = op_push;
 
         let op_pop = ( flag, op1, op2, op3 ) => {
             try {
@@ -371,7 +377,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0xc0] = op_pop;
+        instructions[0xc0] = op_pop;
 
         let op_call = ( flag, op1, op2, op3 ) => {
             try {
@@ -383,7 +389,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0xb0] = op_call;
+        instructions[0xb0] = op_call;
 
         let op_calladd = ( flag, op1, op2, op3 ) => {
             try {
@@ -396,7 +402,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0xba] = op_calladd;
+        instructions[0xba] = op_calladd;
 
         let op_callsub = ( flag, op1, op2, op3 ) => {
             try {
@@ -409,7 +415,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0xb9] = op_callsub;
+        instructions[0xb9] = op_callsub;
 
         let op_ret = ( flag, op1, op2, op3 ) => {
             try {
@@ -421,8 +427,8 @@ export default class nlp16 {
                 throw err;
             }
         }
-        //this.instructions[0xc0] = op_ret;
-        this.instructions[0xe0] = op_ret;   // reti
+        //instructions[0xc0] = op_ret;
+        instructions[0xe0] = op_ret;   // reti
 
         let op_load = ( flag, op1, op2, op3 ) => {
             try {
@@ -432,7 +438,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x80] = op_load;
+        instructions[0x80] = op_load;
 
         let op_loadadd = ( flag, op1, op2, op3 ) => {
             try {
@@ -442,7 +448,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x8a] = op_loadadd;
+        instructions[0x8a] = op_loadadd;
 
         let op_loadsub = ( flag, op1, op2, op3 ) => {
             try {
@@ -452,7 +458,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x89] = op_loadsub;
+        instructions[0x89] = op_loadsub;
 
         let op_store = ( flag, op1, op2, op3 ) => {
             try {
@@ -461,7 +467,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x90] = op_store;
+        instructions[0x90] = op_store;
 
         let op_storeadd = ( flag, op1, op2, op3 ) => {
             try {
@@ -471,7 +477,7 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x9a] = op_storeadd;
+        instructions[0x9a] = op_storeadd;
 
         let op_storesub = ( flag, op1, op2, op3 ) => {
             try {
@@ -481,7 +487,9 @@ export default class nlp16 {
                 throw err;
             }
         }
-        this.instructions[0x99] = op_storesub;
+        instructions[0x99] = op_storesub;
+
+        return instructions;
     }
 
     /**
@@ -548,15 +556,20 @@ export default class nlp16 {
             this.changes[ "register" ] = {};
             let [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ] = this.decode();
             console.log( {mode} );
-            if( mode=="step" ) mode = yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
+            if( mode=="step" ) {
+                mode = yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
+                this.change_all = {};
+                this.change_all[ "register" ] = {};
+            }
             this.update_ip( ip_count );
             //console.log(this.changes);
             try {
                 this.exec( opcode, flag, op1, op2, op3 );
+                console.log( this.change_all );
                 if( mode=="step" ) yield this.changes;
                 else if( ( mode=="break") && ( this.break_points.includes( ip )) ) {
-                    yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
-                    yield this.changes;
+                    let chall = this.change_all;
+                    mode = yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3, chall } || "step";
                 }
             } catch( err ) {
                 throw err;
@@ -596,8 +609,6 @@ export default class nlp16 {
      */
     *run_to( address, break_points ) {
         this.change_ip( address );
-        this.changes = {};
-        this.changes[ "register" ] = {};
         while(true) {
             this.changes = {};
             this.changes[ "register" ] = {};
@@ -644,7 +655,7 @@ export default class nlp16 {
         let ip_count = 1;
 
         // 1 word instruction POP(RET) / PUSH / RETI
-        // ir1 -> opcode(16bit) flag(8bit) op1(8bit)
+        // ir1 -> opcode(8bit) flag(4bit) op1(4bit)
         if( opcode == 0xc0 || opcode == 0xd0 || opcode == 0xe0 ) {
             return [ ip_count, ip, opcode, flag, op1, null, null, ir1, null, null ];
         }
@@ -786,6 +797,7 @@ export default class nlp16 {
                 break;
             case this.reg_iv:
                 this.changes[ "register" ][register] = { id: register, from: from, to: value };
+                this.change_all[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ this.reg_iv ] = value;
                 break;
             case this.reg_4:
@@ -796,11 +808,13 @@ export default class nlp16 {
             case this.reg_c:
             case this.reg_d:
                 this.changes[ "register" ][register] = { id: register, from: from, to: value };
+                this.change_all[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_e:
                 console.log( "e: " + (value & 0xff ));
                 this.changes[ "register" ][register] = { id: register, from: from, to: value };
+                this.change_all[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = (value & 0xff );
                 break;
             case this.reg_mem:
@@ -814,10 +828,12 @@ export default class nlp16 {
                 break;
             case this.reg_ip:
                 this.changes[ "register" ][register] = { id: register, from: from, to: value };
+                this.change_all[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_sp:
                 this.changes[ "register" ][register] = { id: register, from: from, to: value };
+                this.change_all[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_zero:
@@ -825,7 +841,7 @@ export default class nlp16 {
             default:
                 throw new IllegalRegisterError('レジスタ名が異常です\nregister_id: ' + register );
         }
-        console.log( this.changes );
+//        console.log( this.changes );
     }
 
     /**
@@ -837,6 +853,8 @@ export default class nlp16 {
         this.register[ this.reg_flag ] = value;
         this.changes[ "register" ][this.reg_flag] = { id: this.reg_flag, from: old, to: value };
         this.changes[ "flag" ] = { id: this.reg_flag, from: old, to: value };
+        this.change_all[ "register" ][this.reg_flag] = { id: this.reg_flag, from: old, to: value };
+        this.change_all[ "flag" ] = { id: this.reg_flag, from: old, to: value };
     }
 
     /**
@@ -848,6 +866,7 @@ export default class nlp16 {
         let from = this.memory[ address ];
         this.memory[ address ] = value;
         if( !("memory" in this.changes) )   this.changes.memory = {};
+        this.changes.memory[ address ] = { address: address, from: from, to: value };
         this.changes.memory[ address ] = { address: address, from: from, to: value };
     }
 }
