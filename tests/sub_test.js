@@ -49,10 +49,10 @@ let cpu = x.web_run(0);
 Deno.test({
     name: "A = 1 - 1",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[IP].to, 4 );  // IPが4になっている
         assertEquals( result2.value.register[A].to, 0 );  // Aが0になっている
         assertEquals( result2.value.flag.to, z );  // フラグがz
@@ -62,8 +62,8 @@ Deno.test({
 Deno.test({
     name: "A = 0 - 1",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xffff );  // Aが0xffffになっている
         assertEquals( result2.value.flag.to, c + s );  // フラグがc,s
     }
@@ -72,12 +72,12 @@ Deno.test({
 Deno.test({
     name: "B = 32766 - (-1)",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[B].to, 0x7fff );  // Bが0x7fffになっている
         assertEquals( result2.value.flag.to, c + v );  // フラグが0
     }
@@ -86,8 +86,8 @@ Deno.test({
 Deno.test({
     name: "B = 32767 - (-1)",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[B].to, 0x8000 );
         assertEquals( result2.value.flag.to, s + v + c );
     }
@@ -96,8 +96,8 @@ Deno.test({
 Deno.test({
     name: "B = -32768 - (-1)",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[B].to, 0x8001 );
         assertEquals( result2.value.flag.to, s + c );
     }
@@ -106,8 +106,8 @@ Deno.test({
 Deno.test({
     name: "D = 0xffff - 0xffff",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[D].to, 0 );
         assertEquals( result2.value.flag.to, z );
     }

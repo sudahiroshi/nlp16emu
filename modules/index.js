@@ -171,7 +171,7 @@ runto.addEventListener('click', () => {
             if( flag & 8 ){
 
                 document.querySelector('#flag_s').classList.add('indicator_on');
-            } 
+            }
             else {
                 document.querySelector('#flag_s').classList.remove('indicator_on');
             }

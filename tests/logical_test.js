@@ -86,10 +86,10 @@ let cpu = x.web_run(0);
 Deno.test({
     name: "OR A, 0 => A=0x0000, z=1",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x0000 );
         assertEquals( result2.value.flag.to, z );
     }
@@ -98,8 +98,8 @@ Deno.test({
 Deno.test({
     name: "OR A, 0x1111 => A=0x1111",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x1111 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -108,8 +108,8 @@ Deno.test({
 Deno.test({
     name: "OR A, 0x2222 => A=0x3333",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x3333 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -118,8 +118,8 @@ Deno.test({
 Deno.test({
     name: "OR A, 0x4444 => A=0x7777",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x7777 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -128,8 +128,8 @@ Deno.test({
 Deno.test({
     name: "OR A, 0x8888 => A=0xffff",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xffff );
         assertEquals( result2.value.flag.to, s );
     }
@@ -139,10 +139,10 @@ Deno.test({
 Deno.test({
     name: "NOT A => 0xffff",
     fn: () => {
-        cpu.next();  // mov a, 0x0000
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");  // mov a, 0x0000
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xffff );
         assertEquals( result2.value.flag.to, s );
     }
@@ -151,8 +151,8 @@ Deno.test({
 Deno.test({
     name: "NOT A => A=0x0000",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x0000 );
         assertEquals( result2.value.flag.to, z );
     }
@@ -161,10 +161,10 @@ Deno.test({
 Deno.test({
     name: "NOT A => 0x5555",
     fn: () => {
-        cpu.next();  // mov a, 0xaaaa
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");  // mov a, 0xaaaa
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x5555 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -173,8 +173,8 @@ Deno.test({
 Deno.test({
     name: "NOT A => A=0xaaaa",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xaaaa );
         assertEquals( result2.value.flag.to, s );
     }
@@ -184,10 +184,10 @@ Deno.test({
 Deno.test({
     name: "XOR A, 0x5555 => A=0xffff",
     fn: () => {
-        cpu.next();  // mov a, 0xaaaa
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");  // mov a, 0xaaaa
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xffff );
         assertEquals( result2.value.flag.to, s );
     }
@@ -196,8 +196,8 @@ Deno.test({
 Deno.test({
     name: "XOR A, 0xaaaa => A=0x5555",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x5555 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -207,10 +207,10 @@ Deno.test({
 Deno.test({
     name: "AND A, 0xffff => A=0xffff",
     fn: () => {
-        cpu.next();  // mov a, 0xffff
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");  // mov a, 0xffff
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xffff );
         assertEquals( result2.value.flag.to, s );
     }
@@ -219,8 +219,8 @@ Deno.test({
 Deno.test({
     name: "AND A, 0xeeee => A=0xeeee",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xeeee );
         assertEquals( result2.value.flag.to, s );
     }
@@ -229,8 +229,8 @@ Deno.test({
 Deno.test({
     name: "AND A, 0xcccc => A=0xcccc",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xcccc );
         assertEquals( result2.value.flag.to, s );
     }
@@ -239,8 +239,8 @@ Deno.test({
 Deno.test({
     name: "AND A, 0x8888 => A=0x8888",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x8888 );
         assertEquals( result2.value.flag.to, s );
     }
@@ -249,8 +249,8 @@ Deno.test({
 Deno.test({
     name: "AND A, 0x0000 => A=0x0000",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x0000 );
         assertEquals( result2.value.flag.to, z );
     }

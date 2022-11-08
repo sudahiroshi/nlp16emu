@@ -110,10 +110,10 @@ let cpu = x.web_run(0);
 Deno.test({
     name: "SLR A => A=0x4000",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x4000 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -122,8 +122,8 @@ Deno.test({
 Deno.test({
     name: "SLR A => A=0x2000",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x2000 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -132,8 +132,8 @@ Deno.test({
 Deno.test({
     name: "SLR A => A=0x1000",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x1000 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -142,10 +142,10 @@ Deno.test({
 Deno.test({
     name: "SLR A => A=0x0000",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0 );
         assertEquals( result2.value.flag.to, z );
     }
@@ -154,10 +154,10 @@ Deno.test({
 Deno.test({
     name: "SLL A => A=0x0002",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x0002 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -166,8 +166,8 @@ Deno.test({
 Deno.test({
     name: "SLL A => A=0x0004",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x0004 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -176,10 +176,10 @@ Deno.test({
 Deno.test({
     name: "SLL A => A=0x8000",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x8000 );
         assertEquals( result2.value.flag.to, s );
     }
@@ -188,8 +188,8 @@ Deno.test({
 Deno.test({
     name: "SLL A => A=0",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0 );
         assertEquals( result2.value.flag.to, z );
     }
@@ -198,10 +198,10 @@ Deno.test({
 Deno.test({
     name: "SAR A => A=0xc000",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xc000 );
         assertEquals( result2.value.flag.to, s );
     }
@@ -210,8 +210,8 @@ Deno.test({
 Deno.test({
     name: "SAR A => A=0xe000",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xe000 );
         assertEquals( result2.value.flag.to, s );
     }
@@ -220,8 +220,8 @@ Deno.test({
 Deno.test({
     name: "SAR A => A=0xf000",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0xf000 );
         assertEquals( result2.value.flag.to, s );
     }
@@ -230,10 +230,10 @@ Deno.test({
 Deno.test({
     name: "SAR A => A=0x0000",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0 );
         assertEquals( result2.value.flag.to, z );
     }
@@ -242,10 +242,10 @@ Deno.test({
 Deno.test({
     name: "SAL A => A=0x0002",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x0002 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -254,8 +254,8 @@ Deno.test({
 Deno.test({
     name: "SAL A => A=0x0004",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x0004 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -264,10 +264,10 @@ Deno.test({
 Deno.test({
     name: "SAL A => A=0x8000",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x8000 );
         assertEquals( result2.value.flag.to, s );
     }
@@ -276,20 +276,20 @@ Deno.test({
 Deno.test({
     name: "SAL A => A=0",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
-        assertEquals( result2.value.register[A].to, 0 );
-        assertEquals( result2.value.flag.to, z );
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
+        assertEquals( result2.value.register[A].to, 0x8000 );
+        assertEquals( result2.value.flag.to, s );
     }
 });
 
 Deno.test({
     name: "SAL A => A=0x8002",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x8002 );
         assertEquals( result2.value.flag.to, s );
     }
@@ -298,8 +298,8 @@ Deno.test({
 Deno.test({
     name: "SAL A => A=0x8004",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x8004 );
         assertEquals( result2.value.flag.to, s );
     }
@@ -308,10 +308,10 @@ Deno.test({
 Deno.test({
     name: "ROR A => A=0x4444",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x4444 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -320,8 +320,8 @@ Deno.test({
 Deno.test({
     name: "ROR A => A=0x2222",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x2222 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -330,8 +330,8 @@ Deno.test({
 Deno.test({
     name: "ROR A => A=0x1111",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x1111 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -340,8 +340,8 @@ Deno.test({
 Deno.test({
     name: "ROR A => A=0x8888",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x8888 );
         assertEquals( result2.value.flag.to, s );
     }
@@ -350,10 +350,10 @@ Deno.test({
 Deno.test({
     name: "ROL A => A=0x1111",
     fn: () => {
-        cpu.next();
-        cpu.next();
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        cpu.next("step");
+        cpu.next("step");
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x1111 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -362,8 +362,8 @@ Deno.test({
 Deno.test({
     name: "ROL A => A=0x2222",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x2222 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -372,8 +372,8 @@ Deno.test({
 Deno.test({
     name: "ROL A => A=0x4444",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x4444 );
         assertEquals( result2.value.flag.to, 0 );
     }
@@ -382,8 +382,8 @@ Deno.test({
 Deno.test({
     name: "ROL A => A=0x8888",
     fn: () => {
-        let result1 = cpu.next();
-        let result2 = cpu.next();
+        let result1 = cpu.next("step");
+        let result2 = cpu.next("step");
         assertEquals( result2.value.register[A].to, 0x8888 );
         assertEquals( result2.value.flag.to, s );
     }

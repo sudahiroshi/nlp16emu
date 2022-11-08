@@ -66,6 +66,8 @@ export default class nlp16 {
          */
         this.break_points = [];
 
+        /** デバッグ時にtrueにする */
+        this.debug = false;
     }
     /**
      * 命令セットの定義
@@ -514,7 +516,7 @@ export default class nlp16 {
             let [ ip_count, ip, opcode, flag, op1, op2, op3 ] = this.decode();
             this.update_ip( ip_count );
             try {
-                //console.log( {ip, opcode, flag, op1, op2, op3})
+                if( this.debug )  console.log( {ip, opcode, flag, op1, op2, op3})
                 this.exec( opcode, flag, op1, op2, op3 );
             } catch( err ) {
                 if( err instanceof UnasignedInstructionError ) {
@@ -555,17 +557,17 @@ export default class nlp16 {
             this.changes = {};
             this.changes[ "register" ] = {};
             let [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ] = this.decode();
-            console.log( {mode} );
+            if( this.debug )    console.log( {mode} );
             if( mode=="step" ) {
                 mode = yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
                 this.change_all = {};
                 this.change_all[ "register" ] = {};
             }
             this.update_ip( ip_count );
-            //console.log(this.changes);
+            if( this.debug )    console.log(this.changes);
             try {
                 this.exec( opcode, flag, op1, op2, op3 );
-                console.log( this.change_all );
+                if( this.debug )    console.log( this.change_all );
                 if( mode=="step" ) yield this.changes;
                 else if( ( mode=="break") && ( this.break_points.includes( ip )) ) {
                     let chall = this.change_all;
@@ -613,15 +615,11 @@ export default class nlp16 {
             this.changes = {};
             this.changes[ "register" ] = {};
             let [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ] = this.decode();
-            //yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
-            console.log( { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 } );
+            if( this.debug )    console.log( { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 } );
             this.update_ip( ip_count );
-            //console.log(this.changes);
+            if( this.debug )    console.log(this.changes);
             try {
                 this.exec( opcode, flag, op1, op2, op3 );
-                //yield this.changes;
-                let a = this.changes;
-                console.log( a );
             } catch( err ) {
                 throw err;
             }
@@ -726,8 +724,8 @@ export default class nlp16 {
                 this.instructions[opcode](this.register[this.reg_flag], op1, op2, op3);
             } catch( err ) {
                 if( err instanceof TypeError ) {
-                    console.log({opcode,flag,op1,op2,op3});
-                    console.log(this.instructions[opcode]);
+                    if( this.debug )    console.log({opcode,flag,op1,op2,op3});
+                    if( this.debug )    console.log(this.instructions[opcode]);
                     throw new UnasignedInstructionError('Unasigned instruction error');
                 } else throw err;
             }
@@ -786,7 +784,7 @@ export default class nlp16 {
      * @param {Number} value 代入する値
      */
     store_register( register, value ) {
-        console.log( { register, value });
+        if( this.debug )    console.log( { register, value });
         let from = this.register[ register ];
         value &= 0xffff;
         switch( register ) {
@@ -841,13 +839,13 @@ export default class nlp16 {
             default:
                 throw new IllegalRegisterError('レジスタ名が異常です\nregister_id: ' + register );
         }
-//        console.log( this.changes );
+        if( this.debug )    console.log( this.changes );
     }
 
     /**
      * フラグを変更し，変更前の情報とともにthis.changesに反映させる
-     * @param {Number} old 
-     * @param {Number} value 
+     * @param {Number} old 変更前の値
+     * @param {Number} value 変更後の値
      */
     store_flag( old, value ) {
         this.register[ this.reg_flag ] = value;
