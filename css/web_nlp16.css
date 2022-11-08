@@ -98,3 +98,9 @@ table {
     background-color: rgb(236, 212, 212);
     border-radius: 4px;
 }
+
+.breakpoint {
+    border-bottom: #f22;
+    border-bottom-width: 2px;
+    border-bottom-style: dashed;
+}

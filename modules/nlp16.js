@@ -53,6 +53,8 @@ export default class nlp16 {
          */
         this.changes = {};
         this.changes[ "register" ] = {};
+        this.change_all = {};
+        this.change_all[ "register" ] = {};
 
         // 命令の定義
         // 命令はinstructions (連想配列) に代入される
@@ -554,17 +556,20 @@ export default class nlp16 {
             this.changes[ "register" ] = {};
             let [ ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 ] = this.decode();
             console.log( {mode} );
-            if( mode=="step" ) mode = yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
+            if( mode=="step" ) {
+                mode = yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
+                this.change_all = {};
+                this.change_all[ "register" ] = {};
+            }
             this.update_ip( ip_count );
             //console.log(this.changes);
             try {
                 this.exec( opcode, flag, op1, op2, op3 );
+                console.log( this.change_all );
                 if( mode=="step" ) yield this.changes;
                 else if( ( mode=="break") && ( this.break_points.includes( ip )) ) {
-                    yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
-                    yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3 };
-                    yield this.changes;
-                    mode = "step";
+                    let chall = this.change_all;
+                    mode = yield { ip_count, ip, opcode, flag, op1, op2, op3, ir1, ir2, ir3, chall } || "step";
                 }
             } catch( err ) {
                 throw err;
@@ -792,6 +797,7 @@ export default class nlp16 {
                 break;
             case this.reg_iv:
                 this.changes[ "register" ][register] = { id: register, from: from, to: value };
+                this.change_all[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ this.reg_iv ] = value;
                 break;
             case this.reg_4:
@@ -802,11 +808,13 @@ export default class nlp16 {
             case this.reg_c:
             case this.reg_d:
                 this.changes[ "register" ][register] = { id: register, from: from, to: value };
+                this.change_all[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_e:
                 console.log( "e: " + (value & 0xff ));
                 this.changes[ "register" ][register] = { id: register, from: from, to: value };
+                this.change_all[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = (value & 0xff );
                 break;
             case this.reg_mem:
@@ -820,10 +828,12 @@ export default class nlp16 {
                 break;
             case this.reg_ip:
                 this.changes[ "register" ][register] = { id: register, from: from, to: value };
+                this.change_all[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_sp:
                 this.changes[ "register" ][register] = { id: register, from: from, to: value };
+                this.change_all[ "register" ][register] = { id: register, from: from, to: value };
                 this.register[ register ] = value;
                 break;
             case this.reg_zero:
@@ -843,6 +853,8 @@ export default class nlp16 {
         this.register[ this.reg_flag ] = value;
         this.changes[ "register" ][this.reg_flag] = { id: this.reg_flag, from: old, to: value };
         this.changes[ "flag" ] = { id: this.reg_flag, from: old, to: value };
+        this.change_all[ "register" ][this.reg_flag] = { id: this.reg_flag, from: old, to: value };
+        this.change_all[ "flag" ] = { id: this.reg_flag, from: old, to: value };
     }
 
     /**
@@ -854,6 +866,7 @@ export default class nlp16 {
         let from = this.memory[ address ];
         this.memory[ address ] = value;
         if( !("memory" in this.changes) )   this.changes.memory = {};
+        this.changes.memory[ address ] = { address: address, from: from, to: value };
         this.changes.memory[ address ] = { address: address, from: from, to: value };
     }
 }
